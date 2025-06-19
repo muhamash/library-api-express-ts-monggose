@@ -8,12 +8,14 @@
     "build": "tsc",
     "start": "node dist/index.ts"
   },
-  "keywords": [ ],
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "express": "^5.1.0"
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",

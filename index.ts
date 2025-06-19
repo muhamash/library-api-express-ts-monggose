@@ -1,21 +1,16 @@
+import dotenv from "dotenv";
 import app from './app/app';
+import mongooseConnect from './config/mongoose';
+
+dotenv.config();
 
 const port = process.env.PORT || 3000;
 
-const bootstrap = async () =>
+const main = async () =>
 {
     try
     {
-        // await client.connect();
-        // console.log( "✅ Connected to MongoDB Atlas" );
-      
-        // // const db = await client.db( "todosDB" )
-        // // console.log(db)
-        // // const collection = await db.collection( "todos" ).insertOne( {
-        // //     title: 'mongo',
-        // //     description: 'mongodb'
-        // // })
-        // // console.log(collection)
+        mongooseConnect();
 
         app.listen( port, () =>
         {
@@ -28,4 +23,4 @@ const bootstrap = async () =>
     }
 };
 
-bootstrap();
+main();
