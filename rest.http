@@ -1,2 +1,30 @@
-GET http://localhost:3000
+# GET http://localhost:3000
+# Content-Type: application/json
+
+# POST  http://localhost:3000/api/books
+# Content-Type: application/json
+
+# {
+#   "title": "sxsx",
+#   "author": "Stephen Hawking",
+#   "genre": "SCIENCE",
+#   "isbn": "978s05ss5x3ssxs1s3s8016ss3",
+#   "description": "An oversview of cosmology and black holes.",
+#   "copies": 213
+# }
+
+# PUT  http://localhost:3000/api/books/6854662adae8a21ba4f9d29scsc
+# Content-Type: application/json
+
+# {
+#   "title": "sxsxx",
+#   "author": "Stephen Hawking",
+#   "genre": "SCIENCE",
+#   "isbn": "978s05ss5x3ssxxs1s3s8016ss3",
+#   "description": "An oversview of cosmology and black holes.",
+#   "copies": 213
+# }
+
+
+DELETE  http://localhost:3000/api/books/68548aa0d7f1e5d6ba676809
 Content-Type: application/json
