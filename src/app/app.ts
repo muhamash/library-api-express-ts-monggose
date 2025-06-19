@@ -1,14 +1,15 @@
 import express, { Application, Request, Response } from 'express';
 import { home } from './controllers/home.controller';
 import { booksRouter } from './routes/books.route';
+import { borrowRouter } from './routes/borrow.route';
 
 const app: Application = express()
 
 app.use( express.json() );
 
 app.get( "/", home );
-app.use( "/api", booksRouter );
-
+app.use( "/api/books", booksRouter );
+app.use( "/api/borrow", borrowRouter );
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     res.status(404).json({ message: "Route not found" })

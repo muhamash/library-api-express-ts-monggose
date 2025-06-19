@@ -7,7 +7,7 @@ export enum Genre {
     FANTASY = 'FANTASY',
   }
 
-exports interface IBooks
+export interface IBooks
 {
     title: string;
     author: string;
@@ -16,4 +16,8 @@ exports interface IBooks
     description?: string;
     copies: number;
     availability: boolean;
+}
+
+export interface IBookStaticMethod extends Model<IBook> {
+  adjustCopiesAfterBorrow(bookId: string, quantity: number): Promise<IBook>;
 }

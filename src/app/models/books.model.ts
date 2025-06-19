@@ -56,5 +56,27 @@ const booksSchema = new Schema<IBooks>( {
     toObject: { virtuals: true },
 } );
 
+booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, quantity: number )
+{
+    const book = await Books.findById( bookId );
+    // console.log( "Adjusting copies for book:", bookId, "by quantity:", quantity, book );
+  
+    if ( !book ) throw new Error( 'Book not found' );
+  
+    if ( book.copies < quantity && book.availability )
+    {
+        throw new Error( 'Not enough copies available' );
+    }
+  
+    book.copies -= quantity;
+  
+    if ( book.copies === 0 )
+    {
+        book.availability = false;
+    }
+  
+    await book.save();
+    return true
+} );
 
-export const Books = model<IBooks>( "Books", booksSchema );
+export const Books = model<IBooks, IBookStaticMethod>( "Books", booksSchema );

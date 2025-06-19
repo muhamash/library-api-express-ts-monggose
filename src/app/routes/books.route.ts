@@ -3,12 +3,12 @@ import { createBook, deleteBook, getBookById, getBooks, updateBook } from '../co
 
 export const booksRouter = express.Router();
 
-booksRouter.post( "/books", createBook );
+booksRouter.post( "/", createBook );
 
-booksRouter.get( "/books", getBooks );
+booksRouter.get( "/", getBooks );
 
-booksRouter.get( "/books/:id", getBookById );
+booksRouter.get( "/:id", getBookById );
 
-booksRouter.put( "/books/:id", updateBook );
+booksRouter.put( "/:id", updateBook );
 
-booksRouter.delete( "/books/:id", deleteBook );
+booksRouter.delete( "/:id", deleteBook );

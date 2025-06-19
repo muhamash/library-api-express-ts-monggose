@@ -1,4 +1,5 @@
-import { Books } from "../models/books.model";
+import { Request, Response } from 'express';
+import { Books } from '../models/books.model';
 import { zodBookSchema } from "../utils/helper";
 
 export const createBook = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>

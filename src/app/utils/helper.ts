@@ -15,3 +15,17 @@ export const zodBookSchema = z.object( {
     } ),
     availability: z.boolean().default( true ),
 } );
+
+export const zodBorrowSchema = z.object( {
+    book: z.string().min( 1, "Book ID is required" ),
+    quantity: z.number().int().min( 1, "Quantity must be at least 1" ).refine( ( value ) => value >= 1, {
+        message: "Quantity must be at least 1",
+    } ),
+    dueDate: z
+        .string()
+        .transform( ( val ) => new Date( val ) ) 
+        .refine( ( date ) => date.getTime() > Date.now(), {
+            message: "Due date must be in the future",
+        } )
+
+} );
