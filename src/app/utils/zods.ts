@@ -9,6 +9,18 @@ const allowedGenres = [
     "FANTASY",
 ] as const;
 
+const allowedFiltersProperties = [
+    "title",
+    "author",
+    "genre",
+    "isbn",
+    "description",
+    "copies",
+    "availability",
+    "createdAt",
+    "updatedAt",
+] as const;
+
 export const zodBookSchema = z.object( {
     title: z.string().min( 1, "Title is required and minimum 1 char" ),
     author: z.string().min( 1, "Author is required and minimum 1 char" ),
@@ -84,4 +96,16 @@ export const zodUpdateBookSchema = zodBookSchema.partial().extend( {
     } );
 }, {
     message: "At least one field must be provided for update",
+} );
+
+export const zodFilterSchema = z.object( {
+    filter: z.string()
+        .transform( ( val ) => val.toUpperCase() )
+        .refine( ( val ) => allowedGenres.includes( val as any ), {
+            message:
+                "Genre must be one of the following: FICTION, NON_FICTION, SCIENCE, HISTORY, BIOGRAPHY, FANTASY",
+        } ).optional(),
+    sortBy: z.enum( allowedFiltersProperties ).optional(),
+    sort: z.enum( [ "asc", "desc" ] ).optional(),
+    limit: z.string().transform( Number ).default(10).optional(),
 } );

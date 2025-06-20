@@ -14,16 +14,16 @@
 #   "availability": false
 # }
 
-PUT  http://localhost:3000/api/books/6855aa67c47f25b0f6507161
-Content-Type: application/json
-
-{
-  "availability": true
-}
-
-
-# GET  http://localhost:3000/api/books/685583e1e4d6f57b06e8c237
+# PUT  http://localhost:3000/api/books/6855aa67c47f25b0f6507161
 # Content-Type: application/json
+
+# {
+#   "availability": true
+# }
+
+
+GET  http://localhost:3000/api/books?filter=science&sortBy=copiexs&sort=desc&limit=5
+Content-Type: application/json
 
 # POST  http://localhost:3000/api/borrow
 # Content-Type: application/json

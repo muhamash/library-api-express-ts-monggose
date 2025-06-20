@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import { Books } from '../models/books.model';
 import { Borrow } from '../models/borrow.model';
-import { zodBorrowSchema } from '../utils/helper';
+import { zodBorrowSchema } from '../utils/zods';
 
 export const borrowABook = async ( req: Request, res: Response ): Promise<void> =>
 {
     // console.log( "borrowABook controller called" );
     try
     {
-        console.log( "Request Body:", req.body );
+        // console.log( "Request Body:", req.body );
         const zodBook = await zodBorrowSchema.parseAsync( req.body );
 
         const updatedBook = await Books.adjustCopiesAfterBorrow( zodBook.book, zodBook.quantity );
@@ -29,7 +29,7 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
     }
     catch ( error )
     {
-        console.error( "Error in borrowABook controller:", error );
+        // console.error( "Error in borrowABook controller:", error );
       
         if ( error instanceof Error )
         {
@@ -103,6 +103,7 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
             res.status( 404 ).json( {
                 success: false,
                 message: "No borrow records found, summary is empty",
+                data: null
             } );
 
             return;
@@ -116,7 +117,7 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
     }
     catch ( error )
     {
-        console.error( "Error in BorrowBooksSummary controller:", error );
+        // console.error( "Error in BorrowBooksSummary controller:", error );
         res.status( 500 ).json( {
             message: "Internal Server Error",
             success: false,

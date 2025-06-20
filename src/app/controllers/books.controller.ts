@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { Books } from '../models/books.model';
-import { zodBookSchema, zodUpdateBookSchema } from "../utils/helper";
+import { zodBookSchema, zodFilterSchema, zodUpdateBookSchema } from "../utils/zods";
 
 export const createBook = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>
 {
@@ -38,16 +38,21 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
 {
     try
     {
-        const filter = req.query.filter as string | undefined;
-        const sortBy = req.query.sortBy as string || 'createdAt';
-        const sort = req.query.sort === 'desc' ? -1 : 1;
-        const limit = parseInt( req.query.limit as string ) || 10;
+        // console.log( "getBooks controller called with query:", req.query );
+        const zodBody = await zodFilterSchema.parseAsync( req.query );
+        console.log( "Validated Query Parameters:", zodBody );
+        
+        const filter = zodBody.filter as string | undefined;
+        const sortBy = zodBody.sortBy as string || 'createdAt';
+        const sort = zodBody.sort === 'desc' ? -1 : 1;
+        const limit = parseInt( zodBody.limit as string ) || 10;
 
         // console.log(filter?.toUpperCase())
 
         const books = await Books.find( filter ? { genre: filter } : {} )
             .sort( { [ sortBy ]: sort } )
             .limit( limit );
+
 
         if ( !books.length )
         {
@@ -66,11 +71,11 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
         } );
     } catch ( error )
     {
-        console.error( "Error in getBooks controller:", error );
+        // console.error( "Error in getBooks controller:", error );
         res.status( 500 ).json( {
             message: "Internal Server Error",
             success: false,
-            error: error instanceof Error ? error.message : "Unknown error",
+            error: error instanceof Error ? error : "Unknown error",
         } );
     }
 };

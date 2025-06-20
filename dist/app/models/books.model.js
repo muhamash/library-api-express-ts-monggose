@@ -62,9 +62,9 @@ booksSchema.static("adjustCopiesAfterBorrow", async function (bookId, quantity) 
             return false;
         }
         ;
-        console.log(book.copies, quantity, book.availability);
+        console.log(book?.copies, quantity, book.availability);
         if (book.copies < quantity || !book.availability) {
-            throw new Error('Not enough copies available');
+            throw new Error(!book.availability ? "Book is not available" : "Not enough copies available");
             return false;
         }
         book.copies -= quantity;

@@ -72,10 +72,10 @@ booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, 
             return false;
         };
   
-        console.log( book.copies, quantity, book.availability );
+        console.log( book?.copies, quantity, book.availability );
         if ( book.copies < quantity || !book.availability )
         {
-            throw new Error( 'Not enough copies available' );
+            throw new Error( !book.availability ? "Book is not available" : "Not enough copies available" );
             return false;
         }
   
@@ -116,7 +116,6 @@ booksSchema.pre( "find", function ( next )
 // Pre-save middleware: set availability based on copies
 booksSchema.pre( "save", function ( next )
 {
-    // `this` refers to the document
     if ( this.copies === 0 )
     {
         this.availability = false;
@@ -139,10 +138,11 @@ booksSchema.post( "findOneAndDelete", async function ( doc, next )
         {
             // console.log( `[Post-Delete] Book deleted: ${ doc.title }` );
             const deleted = await Borrow.deleteMany( { book: doc._id } );
-            console.log( `[Post-Delete] Deleted ${ deleted.deletedCount } borrow records for book ${ doc.title }` );
         }
+
         next();
-    } catch ( error )
+    }
+    catch ( error )
     {
         console.error( "[Post-Delete Error] Failed to delete borrow records:", error );
 
