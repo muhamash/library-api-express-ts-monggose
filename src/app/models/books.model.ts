@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import { IBooks, IBookStaticMethod } from "../interfaces/books.interface";
+import { Borrow } from "./borrow.model";
 
 const booksSchema = new Schema<IBooks>( {
     title: {
@@ -58,14 +59,15 @@ const booksSchema = new Schema<IBooks>( {
 } );
 
 // static method for adjusting copies after borrowing
-booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, quantity: number )
+booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, quantity: number ) : Promise<boolean>
 {
     const book = await Books.findById( bookId );
     // console.log( "Adjusting copies for book:", bookId, "by quantity:", quantity, book );
   
     if ( !book ) throw new Error( 'Book not found' );
   
-    if ( book.copies < quantity && book.availability )
+    console.log( book.copies, quantity, book.availability );
+    if ( book.copies < quantity && !book.availability )
     {
         throw new Error( 'Not enough copies available' );
     }
@@ -81,5 +83,37 @@ booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, 
     return true
 } );
 
+// Pre-find middleware: normalize genre filter to uppercase
+booksSchema.pre( "find", function ( next )
+{
+    const query = this.getQuery();
+
+    if ( query?.genre )
+    {
+        query.genre = query.genre.toUpperCase();
+        console.log( `[Middleware] Normalized genre filter: ${ query.genre }` );
+    }
+
+    next();
+} );
+
+// delete borrow records when a book is deleted
+booksSchema.post( "findOneAndDelete", async function ( doc, next )
+{
+    try
+    {
+        if ( doc )
+        {
+            // console.log( `[Post-Delete] Book deleted: ${ doc.title }` );
+            const deleted = await Borrow.deleteMany( { book: doc._id } );
+            console.log( `[Post-Delete] Deleted ${ deleted.deletedCount } borrow records for book ${ doc.title }` );
+        }
+        next();
+    } catch ( error )
+    {
+        console.error( "[Post-Delete Error] Failed to delete borrow records:", error );
+        next( error );
+    }
+} );
 
 export const Books = model<IBooks, IBookStaticMethod>( "Books", booksSchema );

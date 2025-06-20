@@ -45,21 +45,9 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
 
         // console.log(filter?.toUpperCase())
 
-        const pipeline: any[] = [];
-
-        // Match stage if filter is provided
-        if ( filter )
-        {
-            pipeline.push( { $match: { genre: filter?.toUpperCase() } } );
-        }
-
-        // Sort stage
-        pipeline.push( { $sort: { [ sortBy ]: sort } } );
-
-        // Limit stage
-        pipeline.push( { $limit: limit } );
-
-        const books = await Books.aggregate( pipeline );
+        const books = await Books.find( filter ? { genre: filter } : {} )
+            .sort( { [ sortBy ]: sort } )
+            .limit( limit );
 
         if ( !books.length )
         {
