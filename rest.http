@@ -5,34 +5,32 @@
 # Content-Type: application/json
 
 # {
-#   "title": "sxsx",
+#   "title": "sxsxss",
 #   "author": "Stephen Hawking",
-#   "genre": "SCIENCE",
-#   "isbn": "978s05ss5x3ssxs1s3s8016ss3x",
+#   "genre": "science",
+#   "isbn": "978s05ss5x3ssxs1ss3s8zzw016ss3x",
 #   "description": "An oversview of cosmology and black holes.",
 #   "copies": 213,
 #   "oka": "sfsf"
 # }
 
-# PUT  http://localhost:3000/api/books/6854662adae8a21ba4f9d29a
+# PUT  http://localhost:3000/api/books/68557ce969ddf41ed4e1c7d8
 # Content-Type: application/json
 
 # {
-#   "title": "sxsscsxx",
-#   "description": "An oversview of cosmology and black hxxxxoles.",
-#   "copies": 2130
+#   "isbn": "978-3-16-148410-0"
 # }
 
 
-# DELETE  http://localhost:3000/api/books/68548b15ec4302d11d8359c9
+# GET  http://localhost:3000/api/books/685583e1e4d6f57b06e8c237
 # Content-Type: application/json
 
 POST  http://localhost:3000/api/borrow
 Content-Type: application/json
 
 {
-  "book": "685514e1e1f28c0e0bbd5d9c",
-  "quantity":10,
+  "book": "685596e37336a7024f7e0e24",
+  "quantity": 1,
   "dueDate": "2025-07-18T00:00:00.000Z"
 }
 

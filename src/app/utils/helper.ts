@@ -1,17 +1,24 @@
 import { z } from "zod";
 
+const allowedGenres = [
+    "FICTION",
+    "NON_FICTION",
+    "SCIENCE",
+    "HISTORY",
+    "BIOGRAPHY",
+    "FANTASY",
+] as const;
+
 export const zodBookSchema = z.object( {
     title: z.string().min( 1, "Title is required and minimum 1 char" ),
     author: z.string().min( 1, "Author is required and minimum 1 char" ),
     genre: z
-        .enum( [ "FICTION", "NON_FICTION", "SCIENCE", "HISTORY", "BIOGRAPHY", "FANTASY" ] )
-        .refine( ( val ) =>
-            [ "FICTION", "NON_FICTION", "SCIENCE", "HISTORY", "BIOGRAPHY", "FANTASY" ].includes( val ),
-            {
-                message:
-                    "Genre must be one of the following: FICTION, NON_FICTION, SCIENCE, HISTORY, BIOGRAPHY, FANTASY",
-            }
-        ),
+        .string()
+        .transform( ( val ) => val.toUpperCase() )
+        .refine( ( val ) => allowedGenres.includes( val as any ), {
+            message:
+                "Genre must be one of the following: FICTION, NON_FICTION, SCIENCE, HISTORY, BIOGRAPHY, FANTASY",
+        } ),
     isbn: z.string().min( 1, "ISBN is required and minimum 1 char" ),
     description: z
         .string()
@@ -61,14 +68,12 @@ export const zodUpdateBookSchema = zodBookSchema.partial().extend( {
             message: "Copies must be a non-negative number",
         } ).optional(),
     genre: z
-        .enum( [ "FICTION", "NON_FICTION", "SCIENCE", "HISTORY", "BIOGRAPHY", "FANTASY" ] )
-        .refine( ( val ) =>
-            [ "FICTION", "NON_FICTION", "SCIENCE", "HISTORY", "BIOGRAPHY", "FANTASY" ].includes( val ),
-            {
-                message:
-                    "Genre must be one of the following: FICTION, NON_FICTION, SCIENCE, HISTORY, BIOGRAPHY, FANTASY",
-            }
-        ).optional(),
+        .string()
+        .transform( ( val ) => val.toUpperCase() )
+        .refine( ( val ) => allowedGenres.includes( val as any ), {
+            message:
+                "Genre must be one of the following: FICTION, NON_FICTION, SCIENCE, HISTORY, BIOGRAPHY, FANTASY",
+        } ).optional(),
     author: z.string().min( 1, "Author is required and minimum 1 char" ).optional(),
     availability: z.boolean().default( true ).optional(),
 } ).refine( ( data ) =>
@@ -79,4 +84,4 @@ export const zodUpdateBookSchema = zodBookSchema.partial().extend( {
     } );
 }, {
     message: "At least one field must be provided for update",
-} );  
+} );

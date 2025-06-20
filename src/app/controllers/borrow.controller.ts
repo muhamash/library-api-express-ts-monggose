@@ -8,6 +8,7 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
     // console.log( "borrowABook controller called" );
     try
     {
+        console.log( "Request Body:", req.body );
         const zodBook = await zodBorrowSchema.parseAsync( req.body );
 
         const updatedBook = await Books.adjustCopiesAfterBorrow( zodBook.book, zodBook.quantity );

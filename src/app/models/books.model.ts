@@ -87,6 +87,8 @@ booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, 
     catch ( error )
     {
         console.error( "[Static Method Error] Failed to adjust copies after borrow:", error );
+        throw error instanceof Error ? error : new Error( "Unknown error" );
+        
         return false;
         
     }
@@ -121,6 +123,7 @@ booksSchema.post( "findOneAndDelete", async function ( doc, next )
     } catch ( error )
     {
         console.error( "[Post-Delete Error] Failed to delete borrow records:", error );
+
         next(error as Error);
     }
 } );

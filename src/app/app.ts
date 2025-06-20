@@ -8,7 +8,16 @@ import { borrowRouter } from './routes/borrow.route';
 const app: Application = express()
 
 app.use(cors({ origin: '*' }));
-app.use(express.json({ type: '*/*' }));
+app.use( express.json( { type: '*/*' } ) );
+app.use( ( req, res, next ) =>
+{
+    const type = req.headers[ 'content-type' ] || '';
+    if ( !type.includes( 'application/json' ) )
+    {
+        req.headers[ 'content-type' ] = 'application/json';
+    }
+    next();
+} );
 app.use( express.json() );
 
 app.get( "/", home );

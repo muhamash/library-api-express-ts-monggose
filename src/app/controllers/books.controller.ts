@@ -53,7 +53,7 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
         {
             res.status( 404 ).json( {
                 success: false,
-                message: `No books found on query: ${ filter ?? sortBy ?? sort ?? limit }`,
+                message: `${filter ? `No books found for genre '${filter}'` : "No books found"}`,
                 data: null,
             } );
             return;
@@ -87,7 +87,8 @@ export const getBookById = async ( req: Request, res: Response, next: NextFuncti
         {
             res.status( 404 ).json( {
                 success: false,
-                message: "Book not found"
+                message: "Book not found",
+                data: null
             } );
 
             return;
