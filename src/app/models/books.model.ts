@@ -66,12 +66,17 @@ booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, 
         const book = await Books.findById( bookId );
         // console.log( "Adjusting copies for book:", bookId, "by quantity:", quantity, book );
   
-        if ( !book ) throw new Error( 'Book not found' );
+        if ( !book )
+        {
+            throw new Error( 'Book not found' )
+            return false;
+        };
   
         console.log( book.copies, quantity, book.availability );
-        if ( book.copies < quantity && !book.availability )
+        if ( book.copies < quantity || !book.availability )
         {
             throw new Error( 'Not enough copies available' );
+            return false;
         }
   
         book.copies -= quantity;
@@ -88,7 +93,7 @@ booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, 
     {
         console.error( "[Static Method Error] Failed to adjust copies after borrow:", error );
         throw error instanceof Error ? error : new Error( "Unknown error" );
-        
+
         return false;
         
     }
@@ -105,6 +110,23 @@ booksSchema.pre( "find", function ( next )
         console.log( `[Middleware] Normalized genre filter: ${ query.genre }` );
     }
 
+    next();
+} );
+
+// Pre-save middleware: set availability based on copies
+booksSchema.pre( "save", function ( next )
+{
+    // `this` refers to the document
+    if ( this.copies === 0 )
+    {
+        this.availability = false;
+    }
+
+    if ( this.copies > 0 )
+    {
+        this.availability = true;
+    }
+  
     next();
 } );
 

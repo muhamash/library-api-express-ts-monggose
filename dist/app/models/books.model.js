@@ -57,11 +57,15 @@ booksSchema.static("adjustCopiesAfterBorrow", async function (bookId, quantity) 
     try {
         const book = await exports.Books.findById(bookId);
         // console.log( "Adjusting copies for book:", bookId, "by quantity:", quantity, book );
-        if (!book)
+        if (!book) {
             throw new Error('Book not found');
+            return false;
+        }
+        ;
         console.log(book.copies, quantity, book.availability);
-        if (book.copies < quantity && !book.availability) {
+        if (book.copies < quantity || !book.availability) {
             throw new Error('Not enough copies available');
+            return false;
         }
         book.copies -= quantity;
         if (book.copies === 0) {
@@ -82,6 +86,17 @@ booksSchema.pre("find", function (next) {
     if (query?.genre) {
         query.genre = query.genre.toUpperCase();
         console.log(`[Middleware] Normalized genre filter: ${query.genre}`);
+    }
+    next();
+});
+// Pre-save middleware: set availability based on copies
+booksSchema.pre("save", function (next) {
+    // `this` refers to the document
+    if (this.copies === 0) {
+        this.availability = false;
+    }
+    if (this.copies > 0) {
+        this.availability = true;
     }
     next();
 });
