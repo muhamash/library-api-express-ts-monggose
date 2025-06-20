@@ -8,9 +8,10 @@
 #   "title": "sxsx",
 #   "author": "Stephen Hawking",
 #   "genre": "SCIENCE",
-#   "isbn": "978s05ss5x3ssxs1s3s8016ss3",
+#   "isbn": "978s05ss5x3ssxs1s3s8016ss3x",
 #   "description": "An oversview of cosmology and black holes.",
-#   "copies": 213
+#   "copies": 213,
+#   "oka": "sfsf"
 # }
 
 # PUT  http://localhost:3000/api/books/6854662adae8a21ba4f9d29scsc
@@ -38,5 +39,8 @@
 #   "dueDate": "2025-07-18T00:00:00.000Z"
 # }
 
-GET  http://localhost:3000/api/borrow
+# GET  http://localhost:3000/api/borrow
+# Content-Type: application/json
+
+GET http://localhost:3000/api/books?sortBy=createdAt
 Content-Type: application/json

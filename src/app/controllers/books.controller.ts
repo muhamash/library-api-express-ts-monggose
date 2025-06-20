@@ -39,7 +39,23 @@ export const getBooks = async ( req: Request, res: Response, next: NextFunction 
     try
     {
         // console.log("getBooks controller called");
-        const books = await Books.find()
+        const { filter, sortBy, sort, limit } = req.query;
+
+        const books = await Books.find( {}, null, {
+            filter,
+            sortBy,
+            sort,
+            limit,
+        } );
+
+        if (  books.length === 0 )
+        {
+            return res.status( 404 ).json( {
+                success: false,
+                message: "No books found",
+                data: null
+            } );
+        }
 
         res.status( 200 ).json( {
             success: true,
@@ -50,7 +66,7 @@ export const getBooks = async ( req: Request, res: Response, next: NextFunction 
     }
     catch ( error )
     {
-        // console.error( "Error in getBooks controller:", error );
+        console.error( "Error in getBooks controller:", error );
         
         res.status( 500 ).json( {
             message: "Internal Server Error",

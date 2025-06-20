@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 
 const booksSchema = new Schema<IBooks>( {
     title: {
@@ -56,6 +56,7 @@ const booksSchema = new Schema<IBooks>( {
     toObject: { virtuals: true },
 } );
 
+// static method for adjusting copies after borrowing
 booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, quantity: number )
 {
     const book = await Books.findById( bookId );
@@ -77,6 +78,31 @@ booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, 
   
     await book.save();
     return true
+} );
+
+// pre query middleware for filtering books based on queries
+booksSchema.pre( "find", function ( next )
+{
+    if ( !( this instanceof mongoose.Query ) ) return next();
+  
+    const query = this.getQuery() as any;
+    const options = this.options as any;
+  
+    if ( options?.filter )
+    {
+        query.genre = options.filter;
+    }
+  
+    const sortField = options?.sortBy || 'createdAt';
+    const sortOrder = options?.sort === 'desc' ? -1 : 1;
+    this.sort( { [ sortField ]: sortOrder } );
+  
+    const limitValue = parseInt( options?.limit ) || 10;
+    this.limit( limitValue );
+  
+    console.log(`[Query Middleware] filter=${options?.filter}, sort=${sortField} ${sortOrder}, limit=${limitValue}`);
+  
+    next();
 } );
 
 export const Books = model<IBooks, IBookStaticMethod>( "Books", booksSchema );
