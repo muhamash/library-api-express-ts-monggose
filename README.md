@@ -55,19 +55,19 @@ This API provides endpoints to manage books and their borrowing transactions wit
 
 ```bash
 # Clone repository
-git clone https://github.com/your-username/library-api.git
-cd library-api
+git clone https://github.com/muhamash/library-api-express-ts-monggose.git
+cd library-api-express-ts-monggose-main
 
 # Install dependencies
 npm install
 
 # Copy example environment variables
-cp .env.example .env
+cp .env
 
 # Edit .env to set your MongoDB connection string and port
 ```
 
-### Example .env
+### .env File
 
 ```ini
 PORT=3000

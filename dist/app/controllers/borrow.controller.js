@@ -81,7 +81,7 @@ const BorrowBooksSummary = async (req, res) => {
         if (summary.length === 0) {
             res.status(404).json({
                 success: false,
-                message: "No borrow records found",
+                message: "No borrow records found, summary is empty",
             });
             return;
         }

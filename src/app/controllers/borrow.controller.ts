@@ -101,7 +101,7 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
         {
             res.status( 404 ).json( {
                 success: false,
-                message: "No borrow records found",
+                message: "No borrow records found, summary is empty",
             } );
 
             return;

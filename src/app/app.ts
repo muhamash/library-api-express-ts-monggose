@@ -1,10 +1,14 @@
+import cors from 'cors';
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { home } from './controllers/home.controller';
 import { booksRouter } from './routes/books.route';
 import { borrowRouter } from './routes/borrow.route';
 
+
 const app: Application = express()
 
+app.use(cors({ origin: '*' }));
+app.use(express.json({ type: '*/*' }));
 app.use( express.json() );
 
 app.get( "/", home );
