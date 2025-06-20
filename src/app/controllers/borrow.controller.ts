@@ -29,7 +29,7 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
             res.status( 400 ).json( {
                 success: false,
                 message: "Failed to borrow the book",
-                error: error instanceof Error ? { name: error.name, message: error.message } : error,
+                error: error instanceof Error ? error : "Unknown error",
             } );
         }
 
@@ -62,7 +62,66 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
         res.status( 500 ).json( {
             message: "Internal Server Error",
             success: false,
-            error: error instanceof Error ? { name: error.name, message: error.message } : error,
+            error: error instanceof Error ? error : "Unknown error",
         } );
     }
 };
+
+export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise<void> =>
+{
+    try
+    {
+        const summary = await Borrow.aggregate( [
+            {
+                $group: {
+                    _id: '$book',
+                    totalQuantity: { $sum: '$quantity' },
+                }
+            },
+            {
+                $lookup: {
+                    from: 'books',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'bookDetails'
+                }
+            },
+            {
+                $unwind: '$bookDetails'
+            },
+            {
+                $project: {
+                    _id: 0,
+                    book: {
+                        title: '$bookDetails.title',
+                        isbn: '$bookDetails.isbn'
+                    },
+                    totalQuantity: 1
+                }
+            }
+        ] );
+
+        if( summary.length === 0 )
+        {
+            return res.status( 404 ).json( {
+                success: false,
+                message: "No borrow records found",
+            } );
+        }
+        
+        res.status( 200 ).json( {
+            success: true,
+            message: "Borrow summary retrieved successfully",
+            data: summary,
+        } );
+    }
+    catch ( error )
+    {
+        console.error( "Error in BorrowBooksSummary controller:", error );
+        res.status( 500 ).json( {
+            message: "Internal Server Error",
+            success: false,
+            error: error instanceof Error ? error : "Unknown error",
+        } );
+    }
+}

@@ -29,11 +29,14 @@
 # DELETE  http://localhost:3000/api/books/68548aa0d7f1e5d6ba676809
 # Content-Type: application/json
 
-POST  http://localhost:3000/api/borrow
-Content-Type: application/json
+# POST  http://localhost:3000/api/borrow
+# Content-Type: application/json
 
-{
-  "book": "6854662adae8a21ba4f9d29a",
-  "quantity": 2,
-  "dueDate": "2025-07-18T00:00:00.000Z"
-}
+# {
+#   "book": "6854662adae8a21ba4f9d29a",
+#   "quantity": 200,
+#   "dueDate": "2025-07-18T00:00:00.000Z"
+# }
+
+GET  http://localhost:3000/api/borrow
+Content-Type: application/json
