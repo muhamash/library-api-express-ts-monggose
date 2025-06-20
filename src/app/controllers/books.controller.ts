@@ -56,7 +56,7 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
         {
             res.status( 404 ).json( {
                 success: false,
-                message: "No books found",
+                message: `No books found on query: ${filter ?? sortBy ?? sort ?? limit}`,
                 data: null,
             } );
 
@@ -178,7 +178,7 @@ export const deleteBook = async ( req: Request, res: Response, next: NextFunctio
 
             return;
         }
-        
+
         res.status( 200 ).json( {
             success: true,
             message: "Book deleted successfully",
