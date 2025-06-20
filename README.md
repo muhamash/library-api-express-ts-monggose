@@ -1,65 +1,101 @@
-# 📚 Library API (Express + Mongoose + TypeScript)
+# 📚 Library Management API (Express + Mongoose + TypeScript)
 
-A RESTful API for managing a library system — built with **Express.js**, **Mongoose**, and **TypeScript**.
-
-This API allows you to:
-- 📘 Create, read, filter, and sort books
-- 📥 Borrow books with inventory control
-- 📊 View borrowed books summary with aggregation
+A robust RESTful API for managing a library system, built with **Express.js**, **Mongoose**, and **TypeScript**.
 
 ---
 
-## 🚀 Project Setup
+## 🚀 Overview
 
-### ✅ Requirements
-- Node.js ≥ 18
-- MongoDB Atlas or Local MongoDB
-- npm / yarn
+This API provides endpoints to manage books and their borrowing transactions with features like:
+
+- Full CRUD operations on **Books**  
+- Borrowing books with inventory checks and business logic enforcement  
+- Aggregated summaries of borrowed books  
+- Schema validation and error handling with **Zod**  
+- Use of Mongoose middleware (pre/post hooks) and static methods  
+- Support for filtering, sorting, and pagination  
 
 ---
 
-### 📦 Installation
+## 🧩 Features
+
+- **Book Management:** Create, Read (single & list), Update, and Delete books with strict validation  
+- **Borrowing System:** Borrow books with checks on availability, automatic stock updates  
+- **Aggregation:** Get summaries of borrowed books using MongoDB aggregation pipeline  
+- **Data Integrity:** Cascading deletes — deleting a book also deletes its borrow records  
+- **Validation:** Request bodies validated with Zod schemas providing clear error messages  
+- **Error Handling:** Standardized JSON error responses for client and server errors  
+
+---
+
+## 📋 Tech Stack
+
+| Technology       | Purpose                             |
+|------------------|-----------------------------------|
+| Node.js          | Runtime environment                |
+| Express.js       | Web framework                     |
+| TypeScript       | Static typing and tooling          |
+| MongoDB          | NoSQL document database           |
+| Mongoose         | ODM for MongoDB                   |
+| Zod              | Schema validation and parsing     |
+
+---
+
+## ⚙️ Project Setup
+
+### Requirements
+
+- Node.js ≥ 18  
+- MongoDB (Atlas or local instance)  
+- npm or yarn  
+
+---
+
+### Installation
 
 ```bash
-# Clone the repo
+# Clone repository
 git clone https://github.com/your-username/library-api.git
 cd library-api
 
 # Install dependencies
 npm install
 
-# Environment setup
+# Copy example environment variables
 cp .env.example .env
-# Then update Mongo URI inside .env
+
+# Edit .env to set your MongoDB connection string and port
 ```
 
-### ⚙️ .env Example
+### Example .env
 
-```
+```ini
 PORT=3000
 MONGO_URI=mongodb://localhost:27017/library-db
 ```
 
----
-
-### 🔧 Run the Project
+### Running the Server
 
 ```bash
-# Run in dev mode with ts-node-dev
+# Start development server with live reload
 npm run dev
+
+# Or build and start production server
+npm run build
+npm start
 ```
 
 ---
 
-## 📚 API Endpoints
+## 📚 API Endpoints & Usage
 
----
+### 1. Create a Book
 
-### 1. ✅ Create a Book
+**URL:** `POST /api/books`
 
-**POST** `/api/books`
+**Purpose:** Add a new book to the library collection
 
-#### Request Body
+**Request Body:**
 
 ```json
 {
@@ -73,48 +109,131 @@ npm run dev
 }
 ```
 
-#### Response (201)
+**Response (201):**
 
 ```json
 {
   "success": true,
   "message": "Book created successfully",
-  "data": { ...book }
+  "data": {
+    "_id": "64f123abc4567890def12345",
+    "title": "The Theory of Everything",
+    "author": "Stephen Hawking",
+    "genre": "SCIENCE",
+    "isbn": "9780553380163",
+    "description": "An overview of cosmology and black holes.",
+    "copies": 5,
+    "available": true,
+    "createdAt": "2024-11-19T10:23:45.123Z",
+    "updatedAt": "2024-11-19T10:23:45.123Z"
+  }
 }
 ```
 
 ---
 
-### 2. 📖 Get All Books (Supports filter, sort, limit)
+### 2. Get All Books
 
-**GET** `/api/books?filter=FANTASY&sortBy=createdAt&sort=desc&limit=5`
+**URL:** `GET /api/books`
 
-#### Query Params
+**Query Parameters:**
 
-| Param     | Type   | Description                      |
-|-----------|--------|----------------------------------|
-| `filter`  | string | Genre filter                     |
-| `sortBy`  | string | Field to sort by (default: createdAt) |
-| `sort`    | string | `asc` or `desc` (default: asc)   |
-| `limit`   | number | Number of results (default: 10)  |
+- `filter` (optional): Filter by book genre (e.g., SCIENCE, FANTASY)
+- `sortBy` (optional): Field to sort by, default `createdAt`
+- `sort` (optional): `asc` or `desc`, default `asc`
+- `limit` (optional): Number of books to return, default `10`
 
-#### Response (200)
+**Example:** `/api/books?filter=FANTASY&sortBy=createdAt&sort=desc&limit=5`
+
+**Response (200):**
 
 ```json
 {
   "success": true,
   "message": "Books retrieved successfully",
-  "data": [ ...books ]
+  "data": [ /* array of book objects */ ]
 }
 ```
 
 ---
 
-### 3. 📥 Borrow a Book
+### 3. Get Book by ID
 
-**POST** `/api/borrow`
+**URL:** `GET /api/books/:bookId`
 
-#### Request Body
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Book retrieved successfully",
+  "data": { /* single book object */ }
+}
+```
+
+**Error 404:** If book not found, returns
+
+```json
+{
+  "success": false,
+  "message": "Book not found",
+  "data": null
+}
+```
+
+---
+
+### 4. Update Book
+
+**URL:** `PUT /api/books/:bookId`
+
+**Request Body:** Any subset of book fields (title, author, genre, isbn, description, copies, available)
+
+**Example:**
+
+```json
+{
+  "copies": 50
+}
+```
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Book updated successfully",
+  "data": { /* updated book object */ }
+}
+```
+
+**Validation:** At least one field must be present. Invalid inputs return a 400 with validation errors.
+
+---
+
+### 5. Delete Book
+
+**URL:** `DELETE /api/books/:bookId`
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Book deleted successfully",
+  "data": null
+}
+```
+
+**Note:** Deleting a book also deletes all borrow records referencing that book (handled by Mongoose post middleware).
+
+---
+
+### 6. Borrow a Book
+
+**URL:** `POST /api/borrow`
+
+**Request Body:**
 
 ```json
 {
@@ -124,14 +243,14 @@ npm run dev
 }
 ```
 
-#### Business Logic
+**Business Logic:**
 
-- Checks if enough copies are available
-- Deducts borrowed copies
-- If remaining copies = 0 → sets `available: false`
-- Creates a borrow record
+- Checks if requested quantity is available
+- Deducts the quantity from the book's copies
+- Sets available to false if copies reach zero
+- Saves the borrow record
 
-#### Response (200)
+**Response (200):**
 
 ```json
 {
@@ -148,13 +267,20 @@ npm run dev
 }
 ```
 
+**Errors:**
+
+- 400 if quantity requested is more than available copies
+- 404 if book not found
+
 ---
 
-### 4. 📊 Borrowed Books Summary (Aggregation)
+### 7. Borrowed Books Summary
 
-**GET** `/api/borrow`
+**URL:** `GET /api/borrow`
 
-#### Response (200)
+**Purpose:** Returns summary of borrowed books, including total borrowed quantity per book
+
+**Response (200):**
 
 ```json
 {
@@ -181,38 +307,74 @@ npm run dev
 
 ---
 
-## ✅ Schema Validation
+## ⚠️ Error Handling & Validation
 
-- Validated using **Zod**
-- Errors return standardized messages
-- Example:
+- All input data validated via Zod schemas
+- Invalid inputs result in 400 Bad Request with detailed messages
+
+**Generic error format:**
 
 ```json
 {
-  "message": "Internal Server Error",
+  "message": "Validation failed",
   "success": false,
   "error": {
-    "issues": [
-      {
-        "code": "custom",
-        "message": "Due date must be in the future",
-        "path": ["dueDate"]
+    "name": "ValidationError",
+    "errors": {
+      "copies": {
+        "message": "Copies must be a positive number",
+        "name": "ValidatorError",
+        "properties": {
+          "message": "Copies must be a positive number",
+          "type": "min",
+          "min": 0
+        },
+        "kind": "min",
+        "path": "copies",
+        "value": -5
       }
-    ],
-    "name": "ZodError"
+    }
   }
 }
 ```
 
----
-
-## 🔧 Tech Stack
-
-- 🧠 **Node.js**, **Express.js**
-- 🛢 **MongoDB**, **Mongoose**
-- 🧾 **Zod** for schema validation
-- 🔧 **TypeScript**
--  Mongoose query middleware for filtering/sorting
--  
+- 404 responses for not found resources are standardized
+- 500 responses include error message for internal server errors
 
 ---
+
+## 🛠 Architecture & Code Highlights
+
+- **Mongoose Models:** Book and Borrow schemas with validation and references
+- **Interfaces and Types** Interfaces and types for Book and Borrow Schema
+- **Static Methods:** e.g., adjusting book copies after borrowing
+- **Middleware:**
+  - `pre` middleware to normalize queries ( genre uppercase)
+  - `post` middleware to cascade delete borrow records when a book is deleted
+- **Aggregation Pipeline:** For summary endpoint to group and sum borrowed books
+- **Controllers:** Separate controllers handle business logic and data validation
+- **Validation:** Using Zod schemas for request validation, with reusable and extendable schemas
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── controllers/
+│   ├── book.controller.ts
+│   ├── borrow.controller.ts
+├── models/
+│   ├── book.model.ts
+│   ├── borrow.model.ts
+├── routes/
+│   ├── book.routes.ts
+│   ├── borrow.routes.ts
+├── schemas/
+│   ├── book.schema.ts
+│   ├── borrow.schema.ts
+├── utils/
+│   └── helper.ts
+├── app.ts
+└── server.ts
+```
