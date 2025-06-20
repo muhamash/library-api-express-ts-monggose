@@ -14,16 +14,13 @@
 #   "oka": "sfsf"
 # }
 
-# PUT  http://localhost:3000/api/books/6854662adae8a21ba4f9d29scsc
+# PUT  http://localhost:3000/api/books/6854662adae8a21ba4f9d29a
 # Content-Type: application/json
 
 # {
-#   "title": "sxsxx",
-#   "author": "Stephen Hawking",
-#   "genre": "SCIENCE",
-#   "isbn": "978s05ss5x3ssxxs1s3s8016ss3",
-#   "description": "An oversview of cosmology and black holes.",
-#   "copies": 213
+#   "title": "sxsscsxx",
+#   "description": "An oversview of cosmology and black hxxxxoles.",
+#   "copies": 2130
 # }
 
 

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { Books } from '../models/books.model';
-import { zodBookSchema } from "../utils/helper";
+import { zodBookSchema, zodUpdateBookSchema } from "../utils/helper";
 
 export const createBook = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>
 {
@@ -120,7 +120,7 @@ export const updateBook = async ( req: Request, res: Response, next: NextFunctio
         const bookId = req.params?.id;
         // console.log("updateBook controller called with ID:", bookId);
         
-        const zodBooks = await zodBookSchema.parseAsync( req.body );
+        const zodBooks = await zodUpdateBookSchema.parseAsync( req.body );
         // console.log( "Validated Book Data for Update:", zodBooks );
         
         const book = await Books.findByIdAndUpdate( bookId, zodBooks, { new: true } );
