@@ -1,4 +1,5 @@
 import mongoose, { model, Schema } from "mongoose";
+import { IBooks, IBookStaticMethod } from "../interfaces/books.interface";
 
 const booksSchema = new Schema<IBooks>( {
     title: {
@@ -85,8 +86,8 @@ booksSchema.pre( "find", function ( next )
 {
     if ( !( this instanceof mongoose.Query ) ) return next();
   
-    const query = this.getQuery() as any;
-    const options = this.options as any;
+    const query = (this as any).getQuery();
+    const options = (this as any)?.options;
   
     if ( options?.filter )
     {

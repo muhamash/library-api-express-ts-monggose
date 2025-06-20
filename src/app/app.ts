@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application, NextFunction, Request, Response } from 'express';
 import { home } from './controllers/home.controller';
 import { booksRouter } from './routes/books.route';
 import { borrowRouter } from './routes/borrow.route';

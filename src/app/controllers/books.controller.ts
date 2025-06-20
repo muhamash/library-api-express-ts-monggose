@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { Books } from '../models/books.model';
 import { zodBookSchema } from "../utils/helper";
 
@@ -34,47 +34,49 @@ export const createBook = async ( req: Request, res: Response, next: NextFunctio
     }
 };
 
-export const getBooks = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>
+export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
 {
     try
     {
-        // console.log("getBooks controller called");
-        const { filter, sortBy, sort, limit } = req.query;
-
+        // Extract and convert query parameters properly
+        const filter = req.query.filter as string | undefined;
+        const sortBy = req.query.sortBy as string || 'createdAt';
+        const sort = req.query.sort === 'desc' ? 'desc' : 'asc';
+        const limit = parseInt( req.query.limit as string ) || 10;
+  
+        // This triggers pre('find') middleware, where query manipulation is handled
         const books = await Books.find( {}, null, {
             filter,
             sortBy,
             sort,
             limit,
         } );
-
-        if (  books.length === 0 )
+  
+        if ( !books.length )
         {
-            return res.status( 404 ).json( {
+            res.status( 404 ).json( {
                 success: false,
                 message: "No books found",
-                data: null
+                data: null,
             } );
-        }
 
+            return;
+        }
+  
         res.status( 200 ).json( {
             success: true,
             message: "Books retrieved successfully",
-            total: books?.length ?? 0,
-            data: books
+            total: books.length,
+            data: books,
         } );
-    }
-    catch ( error )
+    } catch ( error )
     {
         console.error( "Error in getBooks controller:", error );
-        
         res.status( 500 ).json( {
             message: "Internal Server Error",
             success: false,
-            error: error instanceof Error ? error : "Unknown error",
-        });
-
-        // next(error);
+            error: error instanceof Error ? error.message : "Unknown error",
+        } );
     }
 };
 
@@ -88,11 +90,14 @@ export const getBookById = async ( req: Request, res: Response, next: NextFuncti
         const book = await Books.findById( bookId );
         if ( !book )
         {
-            return res.status( 404 ).json( {
+            res.status( 404 ).json( {
                 success: false,
                 message: "Book not found"
             } );
+
+            return;
         }
+
         res.status( 200 ).json( {
             success: true,
             message: "Book retrieved successfully",
@@ -126,12 +131,15 @@ export const updateBook = async ( req: Request, res: Response, next: NextFunctio
         const book = await Books.findByIdAndUpdate( bookId, zodBooks, { new: true } );
         if ( !book )
         {
-            return res.status( 404 ).json( {
+            res.status( 404 ).json( {
                 success: false,
                 message: "Book not found",
                 data: null
             } );
+
+            return;
         }
+
         res.status( 200 ).json( {
             success: true,
             message: "Book updated successfully",
@@ -162,12 +170,15 @@ export const deleteBook = async ( req: Request, res: Response, next: NextFunctio
         const book = await Books.findByIdAndDelete( bookId );
         if ( !book )
         {
-            return res.status( 404 ).json( {
+            res.status( 404 ).json( {
                 success: false,
                 message: "Book not found",
                 data: null
             } );
+
+            return;
         }
+        
         res.status( 200 ).json( {
             success: true,
             message: "Book deleted successfully",

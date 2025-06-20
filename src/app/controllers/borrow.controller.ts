@@ -24,14 +24,6 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
                 data: borrowedBook,
             } );
         }
-        else
-        {
-            res.status( 400 ).json( {
-                success: false,
-                message: "Failed to borrow the book",
-                error: error instanceof Error ? error : "Unknown error",
-            } );
-        }
 
     }
     catch ( error )
@@ -42,20 +34,24 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
         {
             if ( error.message === "Book not found" )
             {
-                return res.status( 404 ).json( {
+                res.status( 404 ).json( {
                     message: error.message,
                     success: false,
                     error: { name: error.name, message: error.message },
                 } );
+
+                return;
             }
       
             if ( error.message === "Not enough copies available" )
             {
-                return res.status( 400 ).json( {
+                res.status( 400 ).json( {
                     message: error.message,
                     success: false,
                     error: { name: error.name, message: error.message },
                 } );
+
+                return;
             }
         }
       
@@ -96,17 +92,19 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
                         title: '$bookDetails.title',
                         isbn: '$bookDetails.isbn'
                     },
-                    totalQuantity: 1
+                    totalQuantity: 1,
                 }
             }
         ] );
 
         if( summary.length === 0 )
         {
-            return res.status( 404 ).json( {
+            res.status( 404 ).json( {
                 success: false,
                 message: "No borrow records found",
             } );
+
+            return;
         }
         
         res.status( 200 ).json( {
