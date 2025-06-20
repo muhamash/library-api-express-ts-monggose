@@ -1,4 +1,4 @@
-import mongoose, { model, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 import { IBooks, IBookStaticMethod } from "../interfaces/books.interface";
 
 const booksSchema = new Schema<IBooks>( {
@@ -81,29 +81,5 @@ booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, 
     return true
 } );
 
-// pre query middleware for filtering books based on queries
-booksSchema.pre( "find", function ( next )
-{
-    if ( !( this instanceof mongoose.Query ) ) return next();
-  
-    const query = (this as any).getQuery();
-    const options = (this as any)?.options;
-  
-    if ( options?.filter )
-    {
-        query.genre = options.filter;
-    }
-  
-    const sortField = options?.sortBy || 'createdAt';
-    const sortOrder = options?.sort === 'desc' ? -1 : 1;
-    this.sort( { [ sortField ]: sortOrder } );
-  
-    const limitValue = parseInt( options?.limit ) || 10;
-    this.limit( limitValue );
-  
-    console.log(`[Query Middleware] filter=${options?.filter}, sort=${sortField} ${sortOrder}, limit=${limitValue}`);
-  
-    next();
-} );
 
 export const Books = model<IBooks, IBookStaticMethod>( "Books", booksSchema );

@@ -38,35 +38,42 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
 {
     try
     {
-        // Extract and convert query parameters properly
         const filter = req.query.filter as string | undefined;
         const sortBy = req.query.sortBy as string || 'createdAt';
-        const sort = req.query.sort === 'desc' ? 'desc' : 'asc';
+        const sort = req.query.sort === 'desc' ? -1 : 1;
         const limit = parseInt( req.query.limit as string ) || 10;
-  
-        // This triggers pre('find') middleware, where query manipulation is handled
-        const books = await Books.find( {}, null, {
-            filter,
-            sortBy,
-            sort,
-            limit,
-        } );
-  
+
+        // console.log(filter?.toUpperCase())
+
+        const pipeline: any[] = [];
+
+        // Match stage if filter is provided
+        if ( filter )
+        {
+            pipeline.push( { $match: { genre: filter?.toUpperCase() } } );
+        }
+
+        // Sort stage
+        pipeline.push( { $sort: { [ sortBy ]: sort } } );
+
+        // Limit stage
+        pipeline.push( { $limit: limit } );
+
+        const books = await Books.aggregate( pipeline );
+
         if ( !books.length )
         {
             res.status( 404 ).json( {
                 success: false,
-                message: `No books found on query: ${filter ?? sortBy ?? sort ?? limit}`,
+                message: `No books found on query: ${ filter ?? sortBy ?? sort ?? limit }`,
                 data: null,
             } );
-
             return;
         }
-  
+
         res.status( 200 ).json( {
             success: true,
             message: "Books retrieved successfully",
-            total: books.length,
             data: books,
         } );
     } catch ( error )
