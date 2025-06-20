@@ -30,22 +30,18 @@ const createBook = async (req, res, next) => {
 exports.createBook = createBook;
 const getBooks = async (req, res) => {
     try {
-        // Extract and convert query parameters properly
         const filter = req.query.filter;
         const sortBy = req.query.sortBy || 'createdAt';
-        const sort = req.query.sort === 'desc' ? 'desc' : 'asc';
+        const sort = req.query.sort === 'desc' ? -1 : 1;
         const limit = parseInt(req.query.limit) || 10;
-        // This triggers pre('find') middleware, where query manipulation is handled
-        const books = await books_model_1.Books.find({}, null, {
-            filter,
-            sortBy,
-            sort,
-            limit,
-        });
+        // console.log(filter?.toUpperCase())
+        const books = await books_model_1.Books.find(filter ? { genre: filter } : {})
+            .sort({ [sortBy]: sort })
+            .limit(limit);
         if (!books.length) {
             res.status(404).json({
                 success: false,
-                message: "No books found",
+                message: `No books found on query: ${filter ?? sortBy ?? sort ?? limit}`,
                 data: null,
             });
             return;
@@ -53,7 +49,6 @@ const getBooks = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Books retrieved successfully",
-            total: books.length,
             data: books,
         });
     }
@@ -100,7 +95,7 @@ const updateBook = async (req, res, next) => {
     try {
         const bookId = req.params?.id;
         // console.log("updateBook controller called with ID:", bookId);
-        const zodBooks = await helper_1.zodBookSchema.parseAsync(req.body);
+        const zodBooks = await helper_1.zodUpdateBookSchema.parseAsync(req.body);
         // console.log( "Validated Book Data for Update:", zodBooks );
         const book = await books_model_1.Books.findByIdAndUpdate(bookId, zodBooks, { new: true });
         if (!book) {

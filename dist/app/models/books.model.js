@@ -1,40 +1,8 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Books = void 0;
-const mongoose_1 = __importStar(require("mongoose"));
+const mongoose_1 = require("mongoose");
+const borrow_model_1 = require("./borrow.model");
 const booksSchema = new mongoose_1.Schema({
     title: {
         type: String,
@@ -86,35 +54,49 @@ const booksSchema = new mongoose_1.Schema({
 });
 // static method for adjusting copies after borrowing
 booksSchema.static("adjustCopiesAfterBorrow", async function (bookId, quantity) {
-    const book = await exports.Books.findById(bookId);
-    // console.log( "Adjusting copies for book:", bookId, "by quantity:", quantity, book );
-    if (!book)
-        throw new Error('Book not found');
-    if (book.copies < quantity && book.availability) {
-        throw new Error('Not enough copies available');
+    try {
+        const book = await exports.Books.findById(bookId);
+        // console.log( "Adjusting copies for book:", bookId, "by quantity:", quantity, book );
+        if (!book)
+            throw new Error('Book not found');
+        console.log(book.copies, quantity, book.availability);
+        if (book.copies < quantity && !book.availability) {
+            throw new Error('Not enough copies available');
+        }
+        book.copies -= quantity;
+        if (book.copies === 0) {
+            book.availability = false;
+        }
+        await book.save();
+        return true;
     }
-    book.copies -= quantity;
-    if (book.copies === 0) {
-        book.availability = false;
+    catch (error) {
+        console.error("[Static Method Error] Failed to adjust copies after borrow:", error);
+        return false;
     }
-    await book.save();
-    return true;
 });
-// pre query middleware for filtering books based on queries
+// Pre-find middleware: normalize genre filter to uppercase
 booksSchema.pre("find", function (next) {
-    if (!(this instanceof mongoose_1.default.Query))
-        return next();
     const query = this.getQuery();
-    const options = this?.options;
-    if (options?.filter) {
-        query.genre = options.filter;
+    if (query?.genre) {
+        query.genre = query.genre.toUpperCase();
+        console.log(`[Middleware] Normalized genre filter: ${query.genre}`);
     }
-    const sortField = options?.sortBy || 'createdAt';
-    const sortOrder = options?.sort === 'desc' ? -1 : 1;
-    this.sort({ [sortField]: sortOrder });
-    const limitValue = parseInt(options?.limit) || 10;
-    this.limit(limitValue);
-    console.log(`[Query Middleware] filter=${options?.filter}, sort=${sortField} ${sortOrder}, limit=${limitValue}`);
     next();
+});
+// delete borrow records when a book is deleted
+booksSchema.post("findOneAndDelete", async function (doc, next) {
+    try {
+        if (doc) {
+            // console.log( `[Post-Delete] Book deleted: ${ doc.title }` );
+            const deleted = await borrow_model_1.Borrow.deleteMany({ book: doc._id });
+            console.log(`[Post-Delete] Deleted ${deleted.deletedCount} borrow records for book ${doc.title}`);
+        }
+        next();
+    }
+    catch (error) {
+        console.error("[Post-Delete Error] Failed to delete borrow records:", error);
+        next(error);
+    }
 });
 exports.Books = (0, mongoose_1.model)("Books", booksSchema);

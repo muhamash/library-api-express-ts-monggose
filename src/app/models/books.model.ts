@@ -59,28 +59,37 @@ const booksSchema = new Schema<IBooks>( {
 } );
 
 // static method for adjusting copies after borrowing
-booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, quantity: number ) : Promise<boolean>
+booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, quantity: number ): Promise<boolean>
 {
-    const book = await Books.findById( bookId );
-    // console.log( "Adjusting copies for book:", bookId, "by quantity:", quantity, book );
-  
-    if ( !book ) throw new Error( 'Book not found' );
-  
-    console.log( book.copies, quantity, book.availability );
-    if ( book.copies < quantity && !book.availability )
+    try
     {
-        throw new Error( 'Not enough copies available' );
+        const book = await Books.findById( bookId );
+        // console.log( "Adjusting copies for book:", bookId, "by quantity:", quantity, book );
+  
+        if ( !book ) throw new Error( 'Book not found' );
+  
+        console.log( book.copies, quantity, book.availability );
+        if ( book.copies < quantity && !book.availability )
+        {
+            throw new Error( 'Not enough copies available' );
+        }
+  
+        book.copies -= quantity;
+  
+        if ( book.copies === 0 )
+        {
+            book.availability = false;
+        }
+  
+        await book.save();
+        return true
     }
-  
-    book.copies -= quantity;
-  
-    if ( book.copies === 0 )
+    catch ( error )
     {
-        book.availability = false;
+        console.error( "[Static Method Error] Failed to adjust copies after borrow:", error );
+        return false;
+        
     }
-  
-    await book.save();
-    return true
 } );
 
 // Pre-find middleware: normalize genre filter to uppercase
@@ -112,7 +121,7 @@ booksSchema.post( "findOneAndDelete", async function ( doc, next )
     } catch ( error )
     {
         console.error( "[Post-Delete Error] Failed to delete borrow records:", error );
-        next( error );
+        next(error as Error);
     }
 } );
 
