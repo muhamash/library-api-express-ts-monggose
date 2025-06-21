@@ -32,7 +32,6 @@ export const createBook = async ( req: Request, res: Response, next: NextFunctio
       
             res.status( 500 ).json( {
                 message,
-                status: 500,
                 success: false,
                 error: {
                     name: error.name,
@@ -99,7 +98,7 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
                 ? ( error as any ).issues?.[ 0 ]?.message || "Validation error"
                 : error.message;
             
-            res.status( 500 ).json( {
+            res.status( 400 ).json( {
                 message,
                 success: false,
                 error: {
@@ -153,7 +152,7 @@ export const getBookById = async ( req: Request, res: Response, next: NextFuncti
         
         if( error instanceof Error )
         {
-            res.status( 500 ).json( {
+            res.status( 400 ).json( {
                 message: error?.message,
                 success: false,
                 error: error instanceof Error ? error as any : "Unknown error", name: error.name,
@@ -212,9 +211,8 @@ export const updateBook = async ( req: Request, res: Response, next: NextFunctio
                 ? ( error as any ).issues?.[ 0 ]?.message || "Validation error"
                 : error.message;
       
-            res.status( 500 ).json( {
+            res.status( 400 ).json( {
                 message,
-                status: 500,
                 success: false,
                 error: {
                     name: error.name,
@@ -227,7 +225,6 @@ export const updateBook = async ( req: Request, res: Response, next: NextFunctio
         {
             res.status( 500 ).json( {
                 message: "An unknown error occurred",
-                status: 500,
                 success: false,
                 error,
                 name: "UnknownError",
@@ -268,7 +265,7 @@ export const deleteBook = async ( req: Request, res: Response, next: NextFunctio
         
         if ( error instanceof Error )
         {
-            res.status( 500 ).json( {
+            res.status( 400 ).json( {
                 message: error.message,
                 success: false,
                 error: error instanceof Error ? error as any : "Unknown error",

@@ -1,6 +1,6 @@
 # 📚 Library Management API (Express + Mongoose + TypeScript)
 
-A robust RESTful API for managing a library system, built with **Express.js**, **Mongoose**, and **TypeScript**.
+Built with **Express.js**, **Mongoose**, and **TypeScript**.
 
 ---
 
@@ -9,7 +9,7 @@ A robust RESTful API for managing a library system, built with **Express.js**, *
 This API provides endpoints to manage books and their borrowing transactions with features like:
 
 - Full CRUD operations on **Books**  
-- Borrowing books with inventory checks and business logic enforcement  
+- Borrowing books with availability checks and business logic enforcement  
 - Aggregated summaries of borrowed books  
 - Schema validation and error handling with **Zod**  
 - Use of Mongoose middleware (pre/post hooks) and static methods  
@@ -19,12 +19,67 @@ This API provides endpoints to manage books and their borrowing transactions wit
 
 ## 🧩 Features
 
-- **Book Management:** Create, Read (single & list), Update, and Delete books with strict validation  
-- **Borrowing System:** Borrow books with checks on availability, automatic stock updates  
+- **Book Management:** Create, Read (single & list including query), Update, and Delete books with strict validation  
+- **Borrowing System:** Borrow books with checks on availability, automatic stock updates and get borrowed list
 - **Aggregation:** Get summaries of borrowed books using MongoDB aggregation pipeline  
 - **Data Integrity:** Cascading deletes — deleting a book also deletes its borrow records  
 - **Validation:** Request bodies validated with Zod schemas providing clear error messages  
 - **Error Handling:** Standardized JSON error responses for client and server errors  
+
+---
+
+## 🔒 Validations
+
+The API uses **Zod** for strict request body validation, ensuring reliable and consistent data. Here’s a breakdown of key validation rules enforced:
+
+### 📘 Book Schema Validation (`zodBookSchema`)
+
+- **Title**: Must be a non-empty string (min 1 character).
+- **Author**: Must be a non-empty string (min 1 character).
+- **Genre**: Must be one of:
+  - `FICTION`, `NON_FICTION`, `SCIENCE`, `HISTORY`, `BIOGRAPHY`, `FANTASY` (case-insensitive).
+- **ISBN**: Required string with at least 1 character.
+- **Description** (optional): 8–100 characters long.
+- **Copies**:
+  - Must be a **non-negative integer** (no zero or negative values).
+- **Availability**: Boolean (optional).
+
+---
+
+### ✏️ Book Update Schema (`zodUpdateBookSchema`)
+
+- All fields are optional, but:
+  - **At least one** updatable field is required.
+- Same rules apply as `zodBookSchema` for each field.
+- Enforces type and format even in partial updates.
+
+---
+
+### 📦 Borrow Schema (`zodBorrowSchema`)
+
+- **Book**: Must be a valid MongoDB ObjectId (string).
+- **Quantity**:
+  - Must be a **positive integer** (minimum 1).
+- **Due Date**:
+  - Must be a valid future date (not past or current).
+
+---
+
+### 🔎 Filtering & Query (`zodFilterSchema`)
+
+- **filter** (optional): Must be one of the allowed `Genre` values.
+- **sortBy**: Must be one of: `title`, `author`, `genre`, `isbn`, `description`, `copies`, `availability`, `createdAt`, `updatedAt`.
+- **sort**: Can be `"asc"` or `"desc"`.
+- **limit**: Defaults to 10, casted from string to number.
+
+---
+
+### ❗ Additional Business Logic
+
+- ❌ **Cannot borrow more copies than are available.**
+- ✅ On successful borrow, available copies are **automatically decreased**.
+- ♻️ When a book is deleted, all related borrow records are **cascaded and removed**.
+- 📚 Borrow summary endpoints ensure consistent and real-time aggregation of book data.
 
 ---
 
@@ -45,11 +100,39 @@ This API provides endpoints to manage books and their borrowing transactions wit
 
 ### Requirements
 
-- Node.js ≥ 18  
+- Node.js 
 - MongoDB (Atlas or local instance)  
 - npm or yarn  
 
 ---
+
+## 📁 Project Structure
+
+```
+src/
+├── app/
+│   ├── controllers/
+│   │   ├── books.controller.ts
+│   │   └── borrow.controller.ts
+│   ├── interfaces/
+│   │   ├── books.interface.ts
+│   │   └── borrow.interface.ts
+│   ├── models/
+│   │   ├── books.model.ts
+│   │   └── borrow.model.ts
+│   ├── routes/
+│   │   ├── books.routes.ts
+│   │   └── borrow.routes.ts
+│   ├── utils/
+│   │   ├── helper.ts
+│   │   └── zods.ts
+│   └── app.ts
+├── config/
+│   └── mongoose.ts
+├── index.ts
+└── server.ts
+
+```
 
 ### Installation
 
@@ -61,7 +144,7 @@ cd library-api-express-ts-monggose-main
 # Install dependencies
 npm install
 
-# Copy example environment variables
+# Copy environment variables
 cp .env
 
 # Edit .env to set your MongoDB connection string and port
@@ -171,7 +254,7 @@ npm start
 }
 ```
 
-**Error 404:** If book not found, returns
+**Error 404:** If book not found
 
 ```json
 {
@@ -268,9 +351,9 @@ npm start
 ```
 
 **Errors:**
-
-- 400 if quantity requested is more than available copies
-- 404 if book not found
+**Error 404:** If Book is not found
+**Error 400:** If Book is not available
+**Error 400:** If Not enough copies available
 
 ---
 
@@ -307,12 +390,24 @@ npm start
 
 ---
 
-## ⚠️ Error Handling & Validation
+## ⚠️🛡️ Error Handling
 
 - All input data validated via Zod schemas
 - Invalid inputs result in 400 Bad Request with detailed messages
 
 **Generic error format:**
+
+The API provides consistent and meaningful error responses to help clients understand and debug issues easily.
+
+### ❗ Standardized Error Responses
+
+| Status Code | Meaning                  | Description                                                                 |
+|-------------|--------------------------|-----------------------------------------------------------------------------|
+| **400**     | Bad Request              | Validation failures or malformed input. Includes detailed Zod error messages. |
+| **404**     | Not Found                | Returned when a requested resource (e.g., book or borrow record) does not exist. |
+| **500**     | Internal Server Error    | Unexpected server errors. Includes a descriptive error message for debugging. |
+
+### 🔁 Example Error Response Format
 
 ```json
 {
@@ -336,10 +431,6 @@ npm start
     }
   }
 }
-```
-
-- 404 responses for not found resources are standardized
-- 500 responses include error message for internal server errors
 
 ---
 
@@ -356,25 +447,3 @@ npm start
 - **Validation:** Using Zod schemas for request validation, with reusable and extendable schemas
 
 ---
-
-## 📁 Project Structure
-
-```
-src/
-├── controllers/
-│   ├── book.controller.ts
-│   ├── borrow.controller.ts
-├── models/
-│   ├── book.model.ts
-│   ├── borrow.model.ts
-├── routes/
-│   ├── book.routes.ts
-│   ├── borrow.routes.ts
-├── schemas/
-│   ├── book.schema.ts
-│   ├── borrow.schema.ts
-├── utils/
-│   └── helper.ts
-├── app.ts
-└── server.ts
-```
