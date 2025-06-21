@@ -5,10 +5,10 @@ const books_model_1 = require("../models/books.model");
 const zods_1 = require("../utils/zods");
 const createBook = async (req, res, next) => {
     try {
-        // console.log("createBook controller called", req.body);
         const zodBooks = await zods_1.zodBookSchema.parseAsync(req.body);
-        console.log("Validated Book Data:", zodBooks);
+        // console.log( "Validated Book Data:", zodBooks );
         const book = await books_model_1.Books.create(zodBooks);
+        // console.log( "Book created successfully:", req.body, book );
         res.status(201).json({
             success: true,
             message: "Book created successfully",

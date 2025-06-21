@@ -90,6 +90,7 @@ booksSchema.pre("find", function (next) {
 });
 // Pre-save middleware: set availability based on copies
 booksSchema.pre("save", function (next) {
+    console.log(`[Pre-Save] Copies: ${this.copies}, Availability: ${this.availability}`);
     if (this.copies === 0) {
         this.availability = false;
         next();
