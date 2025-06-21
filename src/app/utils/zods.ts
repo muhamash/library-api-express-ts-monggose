@@ -87,7 +87,7 @@ export const zodUpdateBookSchema = zodBookSchema.partial().extend( {
                 "Genre must be one of the following: FICTION, NON_FICTION, SCIENCE, HISTORY, BIOGRAPHY, FANTASY",
         } ).optional(),
     author: z.string().min( 1, "Author is required and minimum 1 char" ).optional(),
-    availability: z.boolean().default( true ).optional(),
+    availability: z.boolean().optional(),
 } ).refine( ( data ) =>
 {
     return Object.keys( data ).some( ( key ) =>
