@@ -3,12 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BorrowBooksSummary = exports.borrowABook = void 0;
 const books_model_1 = require("../models/books.model");
 const borrow_model_1 = require("../models/borrow.model");
-const helper_1 = require("../utils/helper");
+const zods_1 = require("../utils/zods");
 const borrowABook = async (req, res) => {
     // console.log( "borrowABook controller called" );
     try {
-        console.log("Request Body:", req.body);
-        const zodBook = await helper_1.zodBorrowSchema.parseAsync(req.body);
+        // console.log( "Request Body:", req.body );
+        const zodBook = await zods_1.zodBorrowSchema.parseAsync(req.body);
         const updatedBook = await books_model_1.Books.adjustCopiesAfterBorrow(zodBook.book, zodBook.quantity);
         console.log("Validated Borrow Data:", zodBook, updatedBook);
         if (updatedBook) {
@@ -21,7 +21,7 @@ const borrowABook = async (req, res) => {
         }
     }
     catch (error) {
-        console.error("Error in borrowABook controller:", error);
+        // console.error( "Error in borrowABook controller:", error );
         if (error instanceof Error) {
             if (error.message === "Book not found") {
                 res.status(404).json({
@@ -83,6 +83,7 @@ const BorrowBooksSummary = async (req, res) => {
             res.status(404).json({
                 success: false,
                 message: "No borrow records found, summary is empty",
+                data: null
             });
             return;
         }
@@ -93,7 +94,7 @@ const BorrowBooksSummary = async (req, res) => {
         });
     }
     catch (error) {
-        console.error("Error in BorrowBooksSummary controller:", error);
+        // console.error( "Error in BorrowBooksSummary controller:", error );
         res.status(500).json({
             message: "Internal Server Error",
             success: false,

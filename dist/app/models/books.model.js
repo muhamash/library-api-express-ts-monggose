@@ -62,7 +62,6 @@ booksSchema.static("adjustCopiesAfterBorrow", async function (bookId, quantity) 
             return false;
         }
         ;
-        console.log(book?.copies, quantity, book.availability);
         if (book.copies < quantity || !book.availability) {
             throw new Error(!book.availability ? "Book is not available" : "Not enough copies available");
             return false;
@@ -91,13 +90,17 @@ booksSchema.pre("find", function (next) {
 });
 // Pre-save middleware: set availability based on copies
 booksSchema.pre("save", function (next) {
-    // `this` refers to the document
     if (this.copies === 0) {
         this.availability = false;
+        next();
     }
-    if (this.copies > 0) {
-        this.availability = true;
+    else {
+        next();
     }
+    // if ( this.copies > 0 )
+    // {
+    //     this.availability = true;
+    // }
     next();
 });
 // delete borrow records when a book is deleted
@@ -106,7 +109,6 @@ booksSchema.post("findOneAndDelete", async function (doc, next) {
         if (doc) {
             // console.log( `[Post-Delete] Book deleted: ${ doc.title }` );
             const deleted = await borrow_model_1.Borrow.deleteMany({ book: doc._id });
-            console.log(`[Post-Delete] Deleted ${deleted.deletedCount} borrow records for book ${doc.title}`);
         }
         next();
     }

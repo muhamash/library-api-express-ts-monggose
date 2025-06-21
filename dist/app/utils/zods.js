@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.zodUpdateBookSchema = exports.zodBorrowSchema = exports.zodBookSchema = void 0;
+exports.zodFilterSchema = exports.zodUpdateBookSchema = exports.zodBorrowSchema = exports.zodBookSchema = void 0;
 const zod_1 = require("zod");
 const allowedGenres = [
     "FICTION",
@@ -9,6 +9,17 @@ const allowedGenres = [
     "HISTORY",
     "BIOGRAPHY",
     "FANTASY",
+];
+const allowedFiltersProperties = [
+    "title",
+    "author",
+    "genre",
+    "isbn",
+    "description",
+    "copies",
+    "availability",
+    "createdAt",
+    "updatedAt",
 ];
 exports.zodBookSchema = zod_1.z.object({
     title: zod_1.z.string().min(1, "Title is required and minimum 1 char"),
@@ -32,7 +43,7 @@ exports.zodBookSchema = zod_1.z.object({
         .refine((value) => value >= 0, {
         message: "Copies must be a non-negative number",
     }),
-    availability: zod_1.z.boolean().default(true),
+    availability: zod_1.z.boolean().optional(),
 });
 exports.zodBorrowSchema = zod_1.z.object({
     book: zod_1.z.string(),
@@ -79,4 +90,14 @@ exports.zodUpdateBookSchema = exports.zodBookSchema.partial().extend({
     });
 }, {
     message: "At least one field must be provided for update",
+});
+exports.zodFilterSchema = zod_1.z.object({
+    filter: zod_1.z.string()
+        .transform((val) => val.toUpperCase())
+        .refine((val) => allowedGenres.includes(val), {
+        message: "Genre must be one of the following: FICTION, NON_FICTION, SCIENCE, HISTORY, BIOGRAPHY, FANTASY",
+    }).optional(),
+    sortBy: zod_1.z.enum(allowedFiltersProperties).optional(),
+    sort: zod_1.z.enum(["asc", "desc"]).optional(),
+    limit: zod_1.z.string().transform(Number).default("10").optional(),
 });

@@ -44,7 +44,7 @@ export const zodBookSchema = z.object( {
         .refine( ( value ) => value >= 0, {
             message: "Copies must be a non-negative number",
         } ),
-    availability: z.boolean().default( true ),
+    availability: z.boolean().optional(),
 } );
 
 export const zodBorrowSchema = z.object( {
@@ -107,5 +107,5 @@ export const zodFilterSchema = z.object( {
         } ).optional(),
     sortBy: z.enum( allowedFiltersProperties ).optional(),
     sort: z.enum( [ "asc", "desc" ] ).optional(),
-    limit: z.string().transform( Number ).default(10).optional(),
+    limit: z.string().transform( Number ).default("10").optional(),
 } );

@@ -8,7 +8,7 @@ export const createBook = async ( req: Request, res: Response, next: NextFunctio
     {
         // console.log("createBook controller called", req.body);
         const zodBooks = await zodBookSchema.parseAsync( req.body );
-        // console.log( "Validated Book Data:", zodBooks );
+        console.log( "Validated Book Data:", zodBooks );
         
         const book = await Books.create( zodBooks );
 
@@ -45,7 +45,7 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
         const filter = zodBody.filter as string | undefined;
         const sortBy = zodBody.sortBy as string || 'createdAt';
         const sort = zodBody.sort === 'desc' ? -1 : 1;
-        const limit = parseInt( zodBody.limit as string ) || 10;
+        const limit : number = parseInt( zodBody.limit as any) || 10;
 
         // console.log(filter?.toUpperCase())
 
