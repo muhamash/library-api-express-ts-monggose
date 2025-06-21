@@ -432,6 +432,8 @@ The API provides consistent and meaningful error responses to help clients under
   }
 }
 
+```
+
 ---
 
 ## 🛠 Architecture & Code Highlights
@@ -439,11 +441,9 @@ The API provides consistent and meaningful error responses to help clients under
 - **Mongoose Models:** Book and Borrow schemas with validation and references
 - **Interfaces and Types** Interfaces and types for Book and Borrow Schema
 - **Static Methods:** e.g., adjusting book copies after borrowing
-- **Middleware:**
+- **Mongoose Query Middleware:**
   - `pre` middleware to normalize queries ( genre uppercase)
   - `post` middleware to cascade delete borrow records when a book is deleted
 - **Aggregation Pipeline:** For summary endpoint to group and sum borrowed books
 - **Controllers:** Separate controllers handle business logic and data validation
 - **Validation:** Using Zod schemas for request validation, with reusable and extendable schemas
-
----
