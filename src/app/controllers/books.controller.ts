@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { Books } from '../models/books.model';
+import { isZodError } from '../utils/helpers';
 import { zodBookSchema, zodFilterSchema, zodUpdateBookSchema } from "../utils/zods";
 
 export const createBook = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>
@@ -22,16 +23,22 @@ export const createBook = async ( req: Request, res: Response, next: NextFunctio
     }
     catch ( error )
     {
-        // console.error( "Error in createBook controller:", error );
-        
+
         if ( error instanceof Error )
         {
+            const message = isZodError(error)
+                ? ( error as any ).issues?.[ 0 ]?.message || "Validation error"
+                : error.message;
+      
             res.status( 500 ).json( {
-                message: error.message,
+                message,
                 status: 500,
                 success: false,
-                error: error instanceof Error ? error as any : "Unknown error", name: error.name,
-                stack: error.stack
+                error: {
+                    name: error.name,
+                    ...( error as any ),
+                    stack: error.stack,
+                },
             } );
         }
         else
@@ -40,12 +47,11 @@ export const createBook = async ( req: Request, res: Response, next: NextFunctio
                 message: "An unknown error occurred",
                 status: 500,
                 success: false,
-                error: error,
+                error,
                 name: "UnknownError",
-                stack: "No stack trace available"
+                stack: "No stack trace available",
             } );
         }
-        // next(error);
     }
 };
 
@@ -60,7 +66,7 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
         const filter = zodBody.filter as string | undefined;
         const sortBy = zodBody.sortBy as string || 'createdAt';
         const sort = zodBody.sort === 'desc' ? -1 : 1;
-        const limit : number = parseInt( zodBody.limit as any) || 10;
+        const limit: number = parseInt( zodBody.limit as any ) || 10;
 
         // console.log(filter?.toUpperCase())
 
@@ -73,7 +79,7 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
         {
             res.status( 404 ).json( {
                 success: false,
-                message: `${filter ? `No books found for genre '${filter}'` : "No books found"}`,
+                message: `${ filter ? `No books found for genre '${ filter }'` : "No books found" }`,
                 data: null,
             } );
             return;
@@ -86,14 +92,21 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
         } );
     } catch ( error )
     {
-        // console.error( "Error in getBooks controller:", error );
+        // console.error( "Error in getBooks controller:", error.issues );
         if ( error instanceof Error )
         {
+            const message = isZodError(error)
+                ? ( error as any ).issues?.[ 0 ]?.message || "Validation error"
+                : error.message;
+            
             res.status( 500 ).json( {
-                message: error?.message,
+                message,
                 success: false,
-                error: error instanceof Error ? error as any : "Unknown error", name: error.name,
-                stack: error.stack
+                error: {
+                    name: error.name,
+                    ...( error as any ),
+                    stack: error.stack,
+                },
             } );
         }
         else
@@ -192,29 +205,35 @@ export const updateBook = async ( req: Request, res: Response, next: NextFunctio
     }
     catch ( error )
     {
-        // console.error( "Error in updateBook controller:", error );
-        
+      
         if ( error instanceof Error )
         {
+            const message = isZodError(error)
+                ? ( error as any ).issues?.[ 0 ]?.message || "Validation error"
+                : error.message;
+      
             res.status( 500 ).json( {
-                message: error?.message,
+                message,
+                status: 500,
                 success: false,
-                error: error instanceof Error ? error as any : "Unknown error", name: error.name,
-                stack: error.stack
-            });
+                error: {
+                    name: error.name,
+                    ...( error as any ),
+                    stack: error.stack,
+                },
+            } );
         }
         else
         {
             res.status( 500 ).json( {
                 message: "An unknown error occurred",
+                status: 500,
                 success: false,
-                error: error,
+                error,
                 name: "UnknownError",
-                stack: "No stack trace available"
+                stack: "No stack trace available",
             } );
         }
-
-        // next(error);
     }
 }   
 

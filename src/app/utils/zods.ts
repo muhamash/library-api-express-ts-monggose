@@ -65,8 +65,8 @@ export const zodBorrowSchema = z.object( {
 } );
 
 export const zodUpdateBookSchema = zodBookSchema.partial().extend( {
-    title: z.string().min( 1, "and minimum 1 char" ).optional(),
-    isbn: z.string().min( 1, "and minimum 1 char" ).optional(),
+    title: z.string().min( 1, "and minimum 1 char for title" ).optional(),
+    isbn: z.string().min( 1, "and minimum 1 char for author" ).optional(),
     description: z
         .string()
         .min( 8, "Description must be at least 8 characters long" )

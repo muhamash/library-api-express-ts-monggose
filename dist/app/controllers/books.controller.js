@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBook = exports.updateBook = exports.getBookById = exports.getBooks = exports.createBook = void 0;
 const books_model_1 = require("../models/books.model");
+const helpers_1 = require("../utils/helpers");
 const zods_1 = require("../utils/zods");
 const createBook = async (req, res, next) => {
     try {
@@ -17,14 +18,19 @@ const createBook = async (req, res, next) => {
         });
     }
     catch (error) {
-        // console.error( "Error in createBook controller:", error );
         if (error instanceof Error) {
+            const message = (0, helpers_1.isZodError)(error)
+                ? error.issues?.[0]?.message || "Validation error"
+                : error.message;
             res.status(500).json({
-                message: error.message,
+                message,
                 status: 500,
                 success: false,
-                error: error instanceof Error ? error : "Unknown error", name: error.name,
-                stack: error.stack
+                error: {
+                    name: error.name,
+                    ...error,
+                    stack: error.stack,
+                },
             });
         }
         else {
@@ -32,12 +38,11 @@ const createBook = async (req, res, next) => {
                 message: "An unknown error occurred",
                 status: 500,
                 success: false,
-                error: error,
+                error,
                 name: "UnknownError",
-                stack: "No stack trace available"
+                stack: "No stack trace available",
             });
         }
-        // next(error);
     }
 };
 exports.createBook = createBook;
@@ -69,13 +74,19 @@ const getBooks = async (req, res) => {
         });
     }
     catch (error) {
-        // console.error( "Error in getBooks controller:", error );
+        // console.error( "Error in getBooks controller:", error.issues );
         if (error instanceof Error) {
+            const message = (0, helpers_1.isZodError)(error)
+                ? error.issues?.[0]?.message || "Validation error"
+                : error.message;
             res.status(500).json({
-                message: error?.message,
+                message,
                 success: false,
-                error: error instanceof Error ? error : "Unknown error", name: error.name,
-                stack: error.stack
+                error: {
+                    name: error.name,
+                    ...error,
+                    stack: error.stack,
+                },
             });
         }
         else {
@@ -154,25 +165,31 @@ const updateBook = async (req, res, next) => {
         });
     }
     catch (error) {
-        // console.error( "Error in updateBook controller:", error );
         if (error instanceof Error) {
+            const message = (0, helpers_1.isZodError)(error)
+                ? error.issues?.[0]?.message || "Validation error"
+                : error.message;
             res.status(500).json({
-                message: error?.message,
+                message,
+                status: 500,
                 success: false,
-                error: error instanceof Error ? error : "Unknown error", name: error.name,
-                stack: error.stack
+                error: {
+                    name: error.name,
+                    ...error,
+                    stack: error.stack,
+                },
             });
         }
         else {
             res.status(500).json({
                 message: "An unknown error occurred",
+                status: 500,
                 success: false,
-                error: error,
+                error,
                 name: "UnknownError",
-                stack: "No stack trace available"
+                stack: "No stack trace available",
             });
         }
-        // next(error);
     }
 };
 exports.updateBook = updateBook;

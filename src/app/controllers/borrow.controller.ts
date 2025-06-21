@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Books } from '../models/books.model';
 import { Borrow } from '../models/borrow.model';
+import { isZodError } from '../utils/helpers';
 import { zodBorrowSchema } from '../utils/zods';
 
 export const borrowABook = async ( req: Request, res: Response ): Promise<void> =>
@@ -40,8 +41,8 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
                     success: false,
                     error: {
                         name: error.name,
-                        stack: error.stack,
                         ...( error as any ),
+                        stack: error.stack,
                     },
                 } );
                 return;
@@ -55,8 +56,8 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
                     success: false,
                     error: {
                         name: error.name,
-                        stack: error.stack,
                         ...( error as any ),
+                        stack: error.stack,
                     },
                 } );
                 return;
@@ -69,15 +70,21 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
                     success: false,
                     error: {
                         name: error.name,
-                        stack: error.stack,
                         ...( error as any ),
+                        stack: error.stack,
                     },
                 } );
                 return;
             }
         
+
+            const message = isZodError( error )
+                ? ( error as any ).issues?.[ 0 ]?.message || "Validation error"
+                : error.message;
+            // console.log( message );
+
             res.status( 500 ).json( {
-                message: error?.message || "Internal Server Error",
+                message,
                 success: false,
                 error: error instanceof Error ? error as any : "Unknown error", name: error.name,
                 stack: error.stack

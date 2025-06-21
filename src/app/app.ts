@@ -31,10 +31,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
     if (error) {
         // console.log( "error", typeof error );
-        // const errorMessage = JSON.parse(error);
+        // const errorMessage = JSON.stringify(error);
         res.status(400).json({ message: "Something went wrong from global error handler",status: 500,
             success: false,
-            error
+            error: {
+                name: error.name || "UnknownError",
+                message: error.message || "An unknown error occurred",
+                stack: error.stack || "No stack trace available",
+                ...(error as any)
+            }
         } )
     }
 })

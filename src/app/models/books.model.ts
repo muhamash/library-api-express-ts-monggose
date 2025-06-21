@@ -85,6 +85,22 @@ booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, 
         
         if ( book.copies < quantity || !book.availability )
         {
+            if ( !book.availability )
+                {
+                    const err = new Error( "Book is not available" );
+                    Object.assign( err, {
+                        name: "BookNotAvailableError",
+                        status: 404,
+                        success: false,
+                        error: {
+                            name: "[Static Method Error]",
+                            message: "Book is not available",
+                        },
+                        data: null,
+                    } );
+                    throw err;
+            }
+            
             if ( book.copies < quantity )
             {
                 const err = new Error( "Not enough copies available" );
@@ -95,22 +111,6 @@ booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, 
                     error: {
                         name: "[Static Method Error]",
                         message: "Not enough copies available",
-                    },
-                    data: null,
-                } );
-                throw err;
-            }
-
-            if ( !book.availability )
-            {
-                const err = new Error( "Book is not available" );
-                Object.assign( err, {
-                    name: "BookNotAvailableError",
-                    status: 404,
-                    success: false,
-                    error: {
-                        name: "[Static Method Error]",
-                        message: "Book is not available",
                     },
                     data: null,
                 } );
@@ -132,7 +132,7 @@ booksSchema.static( "adjustCopiesAfterBorrow", async function ( bookId: string, 
     }
     catch ( error )
     {
-        console.error( "[Static Method Error] Failed to adjust copies after borrow:", error );
+        // console.error( "[Static Method Error] Failed to adjust copies after borrow:", error );
         throw error instanceof Error ? error : new Error( "Unknown error" );
 
         return false;

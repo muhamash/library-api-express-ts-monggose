@@ -73,20 +73,6 @@ booksSchema.static("adjustCopiesAfterBorrow", async function (bookId, quantity) 
         }
         ;
         if (book.copies < quantity || !book.availability) {
-            if (book.copies < quantity) {
-                const err = new Error("Not enough copies available");
-                Object.assign(err, {
-                    name: "BookNotEnoughSpaceError",
-                    status: 404,
-                    success: false,
-                    error: {
-                        name: "[Static Method Error]",
-                        message: "Not enough copies available",
-                    },
-                    data: null,
-                });
-                throw err;
-            }
             if (!book.availability) {
                 const err = new Error("Book is not available");
                 Object.assign(err, {
@@ -96,6 +82,20 @@ booksSchema.static("adjustCopiesAfterBorrow", async function (bookId, quantity) 
                     error: {
                         name: "[Static Method Error]",
                         message: "Book is not available",
+                    },
+                    data: null,
+                });
+                throw err;
+            }
+            if (book.copies < quantity) {
+                const err = new Error("Not enough copies available");
+                Object.assign(err, {
+                    name: "BookNotEnoughSpaceError",
+                    status: 404,
+                    success: false,
+                    error: {
+                        name: "[Static Method Error]",
+                        message: "Not enough copies available",
                     },
                     data: null,
                 });
@@ -111,7 +111,7 @@ booksSchema.static("adjustCopiesAfterBorrow", async function (bookId, quantity) 
         return true;
     }
     catch (error) {
-        console.error("[Static Method Error] Failed to adjust copies after borrow:", error);
+        // console.error( "[Static Method Error] Failed to adjust copies after borrow:", error );
         throw error instanceof Error ? error : new Error("Unknown error");
         return false;
     }

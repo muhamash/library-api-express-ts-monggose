@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BorrowBooksSummary = exports.borrowABook = void 0;
 const books_model_1 = require("../models/books.model");
 const borrow_model_1 = require("../models/borrow.model");
+const helpers_1 = require("../utils/helpers");
 const zods_1 = require("../utils/zods");
 const borrowABook = async (req, res) => {
     // console.log( "borrowABook controller called" );
@@ -29,8 +30,8 @@ const borrowABook = async (req, res) => {
                     success: false,
                     error: {
                         name: error.name,
-                        stack: error.stack,
                         ...error,
+                        stack: error.stack,
                     },
                 });
                 return;
@@ -41,8 +42,8 @@ const borrowABook = async (req, res) => {
                     success: false,
                     error: {
                         name: error.name,
-                        stack: error.stack,
                         ...error,
+                        stack: error.stack,
                     },
                 });
                 return;
@@ -53,14 +54,18 @@ const borrowABook = async (req, res) => {
                     success: false,
                     error: {
                         name: error.name,
-                        stack: error.stack,
                         ...error,
+                        stack: error.stack,
                     },
                 });
                 return;
             }
+            const message = (0, helpers_1.isZodError)(error)
+                ? error.issues?.[0]?.message || "Validation error"
+                : error.message;
+            // console.log( message );
             res.status(500).json({
-                message: error?.message || "Internal Server Error",
+                message,
                 success: false,
                 error: error instanceof Error ? error : "Unknown error", name: error.name,
                 stack: error.stack

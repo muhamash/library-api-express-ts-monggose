@@ -1,40 +1,46 @@
 # GET http://localhost:3000
 # Content-Type: application/json
 
-POST  http://localhost:3000/api/books
-Content-Type: application/json
-
-{
-  "title": "dsdss",
-  "author": "Stephen Hawkisng",
-  "genre": "SCIENCE",
-  "isbn": "97810515a13sssssdds38s0sx163",
-  "description": "An overview of cosmology and1 black holes.",
-  "copies": 10
-}
-
-# PUT  http://localhost:3000/api/books/6855aa67c47f25b0f6507161
+# POST  http://localhost:3000/api/books
 # Content-Type: application/json
 
 # {
-#   "availability": true
+#   "title": "dxssdssss",
+#   "author": "Stephen Hawkisng",
+#   "genre": "SCIsENCE",
+#   "isbn": "97810515a13sssssszdds38s0sx163",
+#   "description": "An overview of cosmology and1 black holes.",
+#   "copies": 10
+# }
+
+# DELETE   http://localhost:3000/api/books/6856a77b4ca1fcdfa62458ad
+# Content-Type: application/json
+
+# {
+#   "title": "s",
+#   "author": "Stephen Hawkisng",
+#   "genre": "SCIENCE",
+#   "isbn": "97810515a1s3sssssszdds38s0sx163",
+#   "description": "An overview of cosmology and1 black holes.",
+#   "copies": 10,
+#   "availability": false
 # }
 
 
-# GET  http://localhost:3000/api/books?filter=science&sortBy=copiexs&sort=desc&limit=5
+# GET  http://localhost:3000/api/books?filter=science
 # Content-Type: application/json
 
 # POST  http://localhost:3000/api/borrow
 # Content-Type: application/json
 
 # {
-#   "book": "6856a8684ca1fcdfa62458b6",
-#   "quantity": 12,
-#   "dueDate": "2025-07-18T00:00:00.000Z"
+#   "book": "6856a77b4ca1fcdfa62458ad",
+#   "quantity": 2,
+#   "dueDate": "3025-07-18T00:00:00.000Z"
 # }
 
-# GET  http://localhost:3000/api/borrow
-# Content-Type: application/json
+GET  http://localhost:3000/api/borrow
+Content-Type: application/json
 
-# GET http://localhost:3000/api/books?filter=science&sortBy=title&sort=desc&limit=5
+# GET http://localhost:3000/api/books
 # Content-Type: application/json
