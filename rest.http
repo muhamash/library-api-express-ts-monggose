@@ -5,13 +5,13 @@ POST  http://localhost:3000/api/books
 Content-Type: application/json
 
 {
-  "title": "Thssssssssdssexs Tdxxheory of Evesrythings",
-  "author": "Stesdsssxphdxesn Hawkisng",
+  "title": "T1ssssssshs1e as1Theorys of Evesrything",
+  "author": "Stephen Hawkisng",
   "genre": "SCIENCE",
-  "isbn": "97805s5xssd3ssssssxdsss3sx80163",
-  "description": "An overview of cosmology and black holes.",
+  "isbn": "97810515a13ssssssss380sx163",
+  "description": "An overview of cosmology and1 black holes.",
   "copies": 0,
-    "availability": false
+  "availability": true
 }
 
 # PUT  http://localhost:3000/api/books/6855aa67c47f25b0f6507161

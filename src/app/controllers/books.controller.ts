@@ -6,11 +6,12 @@ export const createBook = async ( req: Request, res: Response, next: NextFunctio
 {
     try
     {
-        // console.log("createBook controller called", req.body);
         const zodBooks = await zodBookSchema.parseAsync( req.body );
-        console.log( "Validated Book Data:", zodBooks );
+        // console.log( "Validated Book Data:", zodBooks );
         
         const book = await Books.create( zodBooks );
+
+        // console.log( "Book created successfully:", req.body, book );
 
         res.status( 201 ).json( {
             success: true,
