@@ -18,12 +18,25 @@ const createBook = async (req, res, next) => {
     }
     catch (error) {
         // console.error( "Error in createBook controller:", error );
-        res.status(500).json({
-            message: "Internal Server Error",
-            status: 500,
-            success: false,
-            error: error instanceof Error ? error : "Unknown error",
-        });
+        if (error instanceof Error) {
+            res.status(500).json({
+                message: error.message,
+                status: 500,
+                success: false,
+                error: error instanceof Error ? error : "Unknown error", name: error.name,
+                stack: error.stack
+            });
+        }
+        else {
+            res.status(500).json({
+                message: "An unknown error occurred",
+                status: 500,
+                success: false,
+                error: error,
+                name: "UnknownError",
+                stack: "No stack trace available"
+            });
+        }
         // next(error);
     }
 };
@@ -57,11 +70,23 @@ const getBooks = async (req, res) => {
     }
     catch (error) {
         // console.error( "Error in getBooks controller:", error );
-        res.status(500).json({
-            message: "Internal Server Error",
-            success: false,
-            error: error instanceof Error ? error : "Unknown error",
-        });
+        if (error instanceof Error) {
+            res.status(500).json({
+                message: error?.message,
+                success: false,
+                error: error instanceof Error ? error : "Unknown error", name: error.name,
+                stack: error.stack
+            });
+        }
+        else {
+            res.status(500).json({
+                message: "An unknown error occurred",
+                success: false,
+                error: error,
+                name: "UnknownError",
+                stack: "No stack trace available"
+            });
+        }
     }
 };
 exports.getBooks = getBooks;
@@ -86,11 +111,23 @@ const getBookById = async (req, res, next) => {
     }
     catch (error) {
         // console.error( "Error in getBookById controller:", error );
-        res.status(500).json({
-            message: "Internal Server Error",
-            success: false,
-            error: error instanceof Error ? error : "Unknown error",
-        });
+        if (error instanceof Error) {
+            res.status(500).json({
+                message: error?.message,
+                success: false,
+                error: error instanceof Error ? error : "Unknown error", name: error.name,
+                stack: error.stack
+            });
+        }
+        else {
+            res.status(500).json({
+                message: "An unknown error occurred",
+                success: false,
+                error: error,
+                name: "UnknownError",
+                stack: "No stack trace available"
+            });
+        }
         // next(error);
     }
 };
@@ -118,11 +155,23 @@ const updateBook = async (req, res, next) => {
     }
     catch (error) {
         // console.error( "Error in updateBook controller:", error );
-        res.status(500).json({
-            message: "Internal Server Error",
-            success: false,
-            error: error instanceof Error ? error : "Unknown error",
-        });
+        if (error instanceof Error) {
+            res.status(500).json({
+                message: error?.message,
+                success: false,
+                error: error instanceof Error ? error : "Unknown error", name: error.name,
+                stack: error.stack
+            });
+        }
+        else {
+            res.status(500).json({
+                message: "An unknown error occurred",
+                success: false,
+                error: error,
+                name: "UnknownError",
+                stack: "No stack trace available"
+            });
+        }
         // next(error);
     }
 };
@@ -148,11 +197,24 @@ const deleteBook = async (req, res, next) => {
     }
     catch (error) {
         // console.error( "Error in deleteBook controller:", error );
-        res.status(500).json({
-            message: "Internal Server Error",
-            success: false,
-            error: error instanceof Error ? error : "Unknown error",
-        });
+        if (error instanceof Error) {
+            res.status(500).json({
+                message: error.message,
+                success: false,
+                error: error instanceof Error ? error : "Unknown error",
+                name: error.name,
+                stack: error.stack
+            });
+        }
+        else {
+            res.status(500).json({
+                message: "An unknown error occurred",
+                success: false,
+                error: error,
+                name: "UnknownError",
+                stack: "No stack trace available"
+            });
+        }
         // next(error);
     }
 };

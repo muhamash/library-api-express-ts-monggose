@@ -29,7 +29,7 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
     }
     catch ( error )
     {
-        // console.error( "Error in borrowABook controller:", error );
+        // console.log( error );
       
         if ( error instanceof Error )
         {
@@ -38,30 +38,63 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
                 res.status( 404 ).json( {
                     message: error.message,
                     success: false,
-                    error: { name: error.name, message: error.message },
+                    error: {
+                        name: error.name,
+                        stack: error.stack,
+                        ...( error as any ),
+                    },
                 } );
-
                 return;
             }
-      
+                  
+        
+            if ( error.message === "Book is not available" )
+            {
+                res.status( 400 ).json( {
+                    message: error.message,
+                    success: false,
+                    error: {
+                        name: error.name,
+                        stack: error.stack,
+                        ...( error as any ),
+                    },
+                } );
+                return;
+            }
+              
             if ( error.message === "Not enough copies available" )
             {
                 res.status( 400 ).json( {
                     message: error.message,
                     success: false,
-                    error: { name: error.name, message: error.message },
+                    error: {
+                        name: error.name,
+                        stack: error.stack,
+                        ...( error as any ),
+                    },
                 } );
-
                 return;
             }
+        
+            res.status( 500 ).json( {
+                message: error?.message || "Internal Server Error",
+                success: false,
+                error: error instanceof Error ? error as any : "Unknown error", name: error.name,
+                stack: error.stack
+            } );
         }
-      
-        res.status( 500 ).json( {
-            message: "Internal Server Error",
-            success: false,
-            error: error instanceof Error ? error : "Unknown error",
-        } );
+        else
+        {
+            res.status( 500 ).json( {
+                message: "An unknown error occurred",
+                success: false,
+                error: error,
+                name: "UnknownError",
+                stack: "No stack trace available"
+            } );
+        }
     }
+      
 };
 
 export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise<void> =>
@@ -118,10 +151,24 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
     catch ( error )
     {
         // console.error( "Error in BorrowBooksSummary controller:", error );
-        res.status( 500 ).json( {
-            message: "Internal Server Error",
-            success: false,
-            error: error instanceof Error ? error : "Unknown error",
-        } );
+        if ( error instanceof Error )
+        {
+            res.status( 500 ).json( {
+                message: error?.message || "Internal Server Error",
+                success: false,
+                error: error instanceof Error ? error as any : "Unknown error", name: error.name,
+                stack: error.stack
+            } );
+        }
+        else
+        {
+            res.status( 500 ).json( {
+                message: "An unknown error occurred",
+                success: false,
+                error: error,
+                name: "UnknownError",
+                stack: "No stack trace available"
+            } );
+        }
     }
 }

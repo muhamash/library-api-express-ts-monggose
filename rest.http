@@ -5,13 +5,12 @@ POST  http://localhost:3000/api/books
 Content-Type: application/json
 
 {
-  "title": "T1ssssssshs1e as1Theorys of Evesrything",
+  "title": "dsdss",
   "author": "Stephen Hawkisng",
   "genre": "SCIENCE",
-  "isbn": "97810515a13ssssssss380sx163",
+  "isbn": "97810515a13sssssdds38s0sx163",
   "description": "An overview of cosmology and1 black holes.",
-  "copies": 0,
-  "availability": true
+  "copies": 10
 }
 
 # PUT  http://localhost:3000/api/books/6855aa67c47f25b0f6507161
@@ -29,7 +28,7 @@ Content-Type: application/json
 # Content-Type: application/json
 
 # {
-#   "book": "6855a772623270a4a22fa68f",
+#   "book": "6856a8684ca1fcdfa62458b6",
 #   "quantity": 12,
 #   "dueDate": "2025-07-18T00:00:00.000Z"
 # }

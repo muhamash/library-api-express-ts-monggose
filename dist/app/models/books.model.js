@@ -58,12 +58,49 @@ booksSchema.static("adjustCopiesAfterBorrow", async function (bookId, quantity) 
         const book = await exports.Books.findById(bookId);
         // console.log( "Adjusting copies for book:", bookId, "by quantity:", quantity, book );
         if (!book) {
-            throw new Error('Book not found');
-            return false;
+            const err = new Error("Book not found");
+            Object.assign(err, {
+                name: "BookNotFoundError",
+                status: 404,
+                success: false,
+                error: {
+                    name: "[Static Method Error]",
+                    message: "Book is not available",
+                },
+                data: null,
+            });
+            throw err;
         }
         ;
         if (book.copies < quantity || !book.availability) {
-            throw new Error(!book.availability ? "Book is not available" : "Not enough copies available");
+            if (book.copies < quantity) {
+                const err = new Error("Not enough copies available");
+                Object.assign(err, {
+                    name: "BookNotEnoughSpaceError",
+                    status: 404,
+                    success: false,
+                    error: {
+                        name: "[Static Method Error]",
+                        message: "Not enough copies available",
+                    },
+                    data: null,
+                });
+                throw err;
+            }
+            if (!book.availability) {
+                const err = new Error("Book is not available");
+                Object.assign(err, {
+                    name: "BookNotAvailableError",
+                    status: 404,
+                    success: false,
+                    error: {
+                        name: "[Static Method Error]",
+                        message: "Book is not available",
+                    },
+                    data: null,
+                });
+                throw err;
+            }
             return false;
         }
         book.copies -= quantity;
