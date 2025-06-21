@@ -132,9 +132,6 @@ booksSchema.pre("save", function (next) {
         this.availability = false;
         next();
     }
-    else {
-        next();
-    }
     // if ( this.copies > 0 )
     // {
     //     this.availability = true;
@@ -152,6 +149,60 @@ booksSchema.post("findOneAndDelete", async function (doc, next) {
     }
     catch (error) {
         console.error("[Post-Delete Error] Failed to delete borrow records:", error);
+        next(error);
+    }
+});
+// availability control on update when copies are updated or availability is set to false if copies are 0 no force update return error to the user
+booksSchema.pre("findOneAndUpdate", async function (next) {
+    try {
+        const update = this.getUpdate();
+        if (!update || Array.isArray(update))
+            return next();
+        const query = this.getQuery();
+        const current = await this.model.findOne(query);
+        if (!current) {
+            const err = new Error("Book not found");
+            Object.assign(err, {
+                name: "BookNotFoundError",
+                status: 404,
+                success: false,
+                error: {
+                    name: "[Pre-Update Error]",
+                    message: "Book not found",
+                },
+                data: null,
+            });
+            throw err;
+        }
+        let copies = update.copies ?? update.$set?.copies ?? current.copies;
+        let availability = update.availability ?? update.$set?.availability ?? current.availability;
+        console.log(`[Pre-Update] Current Copies: ${current.copies}, Current Availability: ${current.availability}`);
+        console.log(`[Pre-Update] Incoming Copies: ${copies}, Incoming Availability: ${availability}`);
+        if (copies === 0) {
+            update.$set = {
+                ...update.$set,
+                availability: false,
+            };
+            this.setUpdate(update);
+            availability = false;
+        }
+        if (copies === 0 && availability === true) {
+            const err = new Error("Cannot set availability to true when copies are 0.");
+            Object.assign(err, {
+                name: "InvalidAvailabilityUpdateError",
+                status: 400,
+                success: false,
+                error: {
+                    name: "[Pre-Update Error]",
+                    message: "Cannot set availability to true when copies are 0",
+                },
+                data: null,
+            });
+            throw err;
+        }
+        next();
+    }
+    catch (error) {
         next(error);
     }
 });

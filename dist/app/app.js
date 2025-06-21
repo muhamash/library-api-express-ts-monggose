@@ -34,8 +34,8 @@ app.use((error, req, res, next) => {
             error: {
                 name: error.name || "UnknownError",
                 message: error.message || "An unknown error occurred",
-                stack: error.stack || "No stack trace available",
-                ...error
+                ...error,
+                stack: error.stack || "No stack trace available"
             }
         });
     }

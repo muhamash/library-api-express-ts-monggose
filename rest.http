@@ -13,18 +13,12 @@
 #   "copies": 10
 # }
 
-# DELETE   http://localhost:3000/api/books/6856a77b4ca1fcdfa62458ad
-# Content-Type: application/json
+PUT  http://localhost:3000/api/books/6856eb65f7313e540abc3bfd
+Content-Type: application/json
 
-# {
-#   "title": "s",
-#   "author": "Stephen Hawkisng",
-#   "genre": "SCIENCE",
-#   "isbn": "97810515a1s3sssssszdds38s0sx163",
-#   "description": "An overview of cosmology and1 black holes.",
-#   "copies": 10,
-#   "availability": false
-# }
+{
+  "copies": 0
+}
 
 
 # GET  http://localhost:3000/api/books?filter=science
@@ -39,8 +33,8 @@
 #   "dueDate": "3025-07-18T00:00:00.000Z"
 # }
 
-GET  http://localhost:3000/api/borrow
-Content-Type: application/json
+# GET  http://localhost:3000/api/borrow
+# Content-Type: application/json
 
-# GET http://localhost:3000/api/books
+# GET http://localhost:3000/api/books?sort=asc&filter=science
 # Content-Type: application/json

@@ -447,3 +447,9 @@ The API provides consistent and meaningful error responses to help clients under
 - **Aggregation Pipeline:** For summary endpoint to group and sum borrowed books
 - **Controllers:** Separate controllers handle business logic and data validation
 - **Validation:** Using Zod schemas for request validation, with reusable and extendable schemas
+
+
+----
+
+© 2025 Md Ashraful Alam. All rights reserved.
+## 🛜 https://github.com/muhamash 
