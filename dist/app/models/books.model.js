@@ -42,7 +42,7 @@ const booksSchema = new mongoose_1.Schema({
         required: true,
         min: [0, "Copies -> {VALUE} should not be a negative number"],
     },
-    availability: {
+    available: {
         type: Boolean,
         default: true,
     },
@@ -72,8 +72,8 @@ booksSchema.static("adjustCopiesAfterBorrow", async function (bookId, quantity) 
             throw err;
         }
         ;
-        if (book.copies < quantity || !book.availability) {
-            if (!book.availability) {
+        if (book.copies < quantity || !book.available) {
+            if (!book.available) {
                 const err = new Error("Book is not available");
                 Object.assign(err, {
                     name: "BookNotAvailableError",
@@ -105,7 +105,7 @@ booksSchema.static("adjustCopiesAfterBorrow", async function (bookId, quantity) 
         }
         book.copies -= quantity;
         if (book.copies === 0) {
-            book.availability = false;
+            book.available = false;
         }
         await book.save();
         return true;
@@ -125,16 +125,16 @@ booksSchema.pre("find", function (next) {
     }
     next();
 });
-// Pre-save middleware: set availability based on copies
+// Pre-save middleware: set available based on copies
 booksSchema.pre("save", function (next) {
-    console.log(`[Pre-Save] Copies: ${this.copies}, Availability: ${this.availability}`);
+    console.log(`[Pre-Save] Copies: ${this.copies}, available: ${this.available}`);
     if (this.copies === 0) {
-        this.availability = false;
+        this.available = false;
         next();
     }
     // if ( this.copies > 0 )
     // {
-    //     this.availability = true;
+    //     this.available = true;
     // }
     next();
 });
@@ -177,33 +177,33 @@ booksSchema.pre("findOneAndUpdate", async function (next) {
         const $set = {
             ...update.$set,
             ...('copies' in update ? { copies: update.copies } : {}),
-            ...('availability' in update ? { availability: update.availability } : {}),
+            ...('available' in update ? { available: update.available } : {}),
         };
         // determine final values
         const finalCopies = $set.copies ?? current.copies;
-        const finalAvailability = $set.availability ?? current.availability;
-        // Check for  state: copies = 0 but user tries to set availability = true
-        if (finalCopies === 0 && 'availability' in update && update.availability === true) {
-            const err = new Error("Cannot set availability to true when copies is 0");
+        const finalavailable = $set.available ?? current.available;
+        // Check for  state: copies = 0 but user tries to set available = true
+        if (finalCopies === 0 && 'available' in update && update.available === true) {
+            const err = new Error("Cannot set available to true when copies is 0");
             Object.assign(err, {
-                name: "InvalidAvailabilityError",
+                name: "InvalidavailableError",
                 status: 400,
                 success: false,
                 error: {
                     name: "[Pre-Update Validation Error]",
-                    message: "Cannot set availability to true when copies is 0. Books with 0 copies must have availability set to false.",
+                    message: "Cannot set available to true when copies is 0. Books with 0 copies must have available set to false.",
                 },
                 data: {
                     currentCopies: current.copies,
                     requestedCopies: finalCopies,
-                    requestedAvailability: update.availability,
+                    requestedavailable: update.available,
                 },
             });
             throw err;
         }
-        //apply if copies = 0, force availability = false 
+        //apply if copies = 0, force available = false 
         if (finalCopies === 0) {
-            $set.availability = false;
+            $set.available = false;
         }
         update.$set = $set;
         this.setUpdate(update);

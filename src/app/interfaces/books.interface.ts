@@ -17,7 +17,7 @@ export interface IBooks
     isbn: string;
     description?: string;
     copies: number;
-    availability: boolean;
+    available: boolean;
 }
 
 export interface IBookStaticMethod extends Model<IBooks> {

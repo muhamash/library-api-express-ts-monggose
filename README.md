@@ -9,7 +9,7 @@ Built with **Express.js**, **Mongoose**, and **TypeScript**.
 This API provides endpoints to manage books and their borrowing transactions with features like:
 
 - Full CRUD operations on **Books**  
-- Borrowing books with availability checks and business logic enforcement  
+- Borrowing books with available checks and business logic enforcement  
 - Aggregated summaries of borrowed books  
 - Schema validation and error handling with **Zod**  
 - Use of Mongoose middleware (pre/post hooks) and static methods  
@@ -20,7 +20,7 @@ This API provides endpoints to manage books and their borrowing transactions wit
 ## 🧩 Features
 
 - **Book Management:** Create, Read (single & list including query), Update, and Delete books with strict validation  
-- **Borrowing System:** Borrow books with checks on availability, automatic stock updates and get borrowed list
+- **Borrowing System:** Borrow books with checks on available, automatic stock updates and get borrowed list
 - **Aggregation:** Get summaries of borrowed books using MongoDB aggregation pipeline  
 - **Data Integrity:** Cascading deletes — deleting a book also deletes its borrow records  
 - **Validation:** Request bodies validated with Zod schemas providing clear error messages  
@@ -42,8 +42,8 @@ The API uses **Zod** for strict request body validation, ensuring reliable and c
 - **Description** (optional): 8–100 characters long.
 - **Copies**:
   - Must be a **non-negative integer** (no zero or negative values).
-- **Availability**: Boolean (optional).
-- Automatically sets `availability: false` when a book's `copies` are set to `0`;
+- **available**: Boolean (optional).
+- Automatically sets `available: false` when a book's `copies` are set to `0`;
 
 ---
 
@@ -53,7 +53,7 @@ The API uses **Zod** for strict request body validation, ensuring reliable and c
   - **At least one** updatable field is required.
 - Same rules apply as `zodBookSchema` for each field.
 - Enforces type and format even in partial updates.
-- Controls the availability based on input copies
+- Controls the available based on input copies
 
 ---
 
@@ -64,14 +64,14 @@ The API uses **Zod** for strict request body validation, ensuring reliable and c
 - Must be a **positive integer** (minimum 1).
 - **Due Date**:
 - Must be a valid future date (not past or current).
-- Automatically sets `availability: false` when a book's `copies` are updated to `0`;
+- Automatically sets `available: false` when a book's `copies` are updated to `0`;
 
 ---
 
 ### 🔎 Filtering & Query (`zodFilterSchema`)
 
 - **filter** (optional): Must be one of the allowed `Genre` values.
-- **sortBy**: Must be one of: `title`, `author`, `genre`, `isbn`, `description`, `copies`, `availability`, `createdAt`, `updatedAt`.
+- **sortBy**: Must be one of: `title`, `author`, `genre`, `isbn`, `description`, `copies`, `available`, `createdAt`, `updatedAt`.
 - **sort**: Can be `"asc"` or `"desc"`.
 - **limit**: Defaults to 10, casted from string to number.
 
@@ -294,7 +294,7 @@ npm start
 
 **Validation:** 
 - At least one field must be present. Invalid inputs return a 400 with validation errors.
--  Automatically sets `availability: false` when a book's `copies` are updated to `0`; prevents setting `availability: true` while `copies` is zero.
+-  Automatically sets `available: false` when a book's `copies` are updated to `0`; prevents setting `available: true` while `copies` is zero.
 
 ---
 

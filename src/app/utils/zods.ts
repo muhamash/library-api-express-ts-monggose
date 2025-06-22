@@ -16,7 +16,7 @@ const allowedFiltersProperties = [
     "isbn",
     "description",
     "copies",
-    "availability",
+    "available",
     "createdAt",
     "updatedAt",
 ] as const;
@@ -44,7 +44,7 @@ export const zodBookSchema = z.object( {
         .refine( ( value ) => value >= 0, {
             message: "Copies must be a non-negative number",
         } ),
-    availability: z.boolean().optional(),
+    available: z.boolean().optional(),
 } );
 
 export const zodBorrowSchema = z.object( {
@@ -87,7 +87,7 @@ export const zodUpdateBookSchema = zodBookSchema.partial().extend( {
                 "Genre must be one of the following: FICTION, NON_FICTION, SCIENCE, HISTORY, BIOGRAPHY, FANTASY",
         } ).optional(),
     author: z.string().min( 1, "Author is required and minimum 1 char" ).optional(),
-    availability: z.boolean().optional(),
+    available: z.boolean().optional(),
 } ).refine( ( data ) =>
 {
     return Object.keys( data ).some( ( key ) =>

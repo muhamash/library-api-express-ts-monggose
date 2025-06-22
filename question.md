@@ -7,7 +7,7 @@ Develop a **Library Management System** using **Express**, **TypeScript**, and *
 Your project must include:
 
 *   Proper schema validation
-*   Business logic enforcement (e.g., availability control on borrow)
+*   Business logic enforcement (e.g., available control on borrow)
 *   Use of aggregation pipeline
 *   At least one **Mongoose static or instance method**
 *   Use of **Mongoose middleware** (`pre`, `post`)
