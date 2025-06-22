@@ -43,6 +43,7 @@ The API uses **Zod** for strict request body validation, ensuring reliable and c
 - **Copies**:
   - Must be a **non-negative integer** (no zero or negative values).
 - **Availability**: Boolean (optional).
+- Automatically sets `availability: false` when a book's `copies` are set to `0`;
 
 ---
 
@@ -52,6 +53,7 @@ The API uses **Zod** for strict request body validation, ensuring reliable and c
   - **At least one** updatable field is required.
 - Same rules apply as `zodBookSchema` for each field.
 - Enforces type and format even in partial updates.
+- Controls the availability based on input copies
 
 ---
 
@@ -59,9 +61,10 @@ The API uses **Zod** for strict request body validation, ensuring reliable and c
 
 - **Book**: Must be a valid MongoDB ObjectId (string).
 - **Quantity**:
-  - Must be a **positive integer** (minimum 1).
+- Must be a **positive integer** (minimum 1).
 - **Due Date**:
-  - Must be a valid future date (not past or current).
+- Must be a valid future date (not past or current).
+- Automatically sets `availability: false` when a book's `copies` are updated to `0`;
 
 ---
 
@@ -290,7 +293,9 @@ npm start
 }
 ```
 
-**Validation:** At least one field must be present. Invalid inputs return a 400 with validation errors.
+**Validation:** 
+- At least one field must be present. Invalid inputs return a 400 with validation errors.
+-  Automatically sets `availability: false` when a book's `copies` are updated to `0`; prevents setting `availability: true` while `copies` is zero.
 
 ---
 

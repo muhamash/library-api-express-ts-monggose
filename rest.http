@@ -13,12 +13,12 @@
 #   "copies": 10
 # }
 
-PUT  http://localhost:3000/api/books/6856eb65f7313e540abc3bfd
-Content-Type: application/json
+# PUT  http://localhost:3000/api/books/6856eb65f7313e540abc3bfd
+# Content-Type: application/json
 
-{
-  "copies": 0
-}
+# {
+#   "copies": 0
+# }
 
 
 # GET  http://localhost:3000/api/books?filter=science
