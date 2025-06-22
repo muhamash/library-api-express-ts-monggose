@@ -235,7 +235,7 @@ booksSchema.pre( "findOneAndUpdate", async function ( next )
             availability = false;
         }
 
-        if ( copies === 0 && availability === true )
+        if ( update.copies === 0 && update.availability === true || current.copies === 0 && update.availability === true )
         {
             const err = new Error( "Cannot set availability to true when copies are 0." );
             Object.assign( err, {

@@ -5,20 +5,20 @@
 # Content-Type: application/json
 
 # {
-#   "title": "dxssdssss",
+#   "title": "dxssdsssss",
 #   "author": "Stephen Hawkisng",
-#   "genre": "SCIsENCE",
-#   "isbn": "97810515a13sssssszdds38s0sx163",
+#   "genre": "SCIENCE",
+#   "isbn": "97810515a13sssssszdds3s8s0sx163",
 #   "description": "An overview of cosmology and1 black holes.",
 #   "copies": 10
 # }
 
-# PUT  http://localhost:3000/api/books/6856eb65f7313e540abc3bfd
-# Content-Type: application/json
+PUT  http://localhost:3000/api/books/6858079913f3c117b832751b
+Content-Type: application/json
 
-# {
-#   "copies": 0
-# }
+{
+  "copies": 0
+}
 
 
 # GET  http://localhost:3000/api/books?filter=science
@@ -28,7 +28,7 @@
 # Content-Type: application/json
 
 # {
-#   "book": "6856a77b4ca1fcdfa62458ad",
+#   "book": "68580408baf95c9a00f981cf",
 #   "quantity": 2,
 #   "dueDate": "3025-07-18T00:00:00.000Z"
 # }
