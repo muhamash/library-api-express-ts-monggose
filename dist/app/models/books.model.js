@@ -40,7 +40,7 @@ const booksSchema = new mongoose_1.Schema({
     copies: {
         type: Number,
         required: true,
-        min: [0, "Copies -> {VALUE} should not be a non-negative number"],
+        min: [0, "Copies -> {VALUE} should not be a negative number"],
     },
     availability: {
         type: Boolean,
@@ -176,8 +176,8 @@ booksSchema.pre("findOneAndUpdate", async function (next) {
         }
         let copies = update.copies ?? update.$set?.copies ?? current.copies;
         let availability = update.availability ?? update.$set?.availability ?? current.availability;
-        console.log(`[Pre-Update] Current Copies: ${current.copies}, Current Availability: ${current.availability}`);
-        console.log(`[Pre-Update] Incoming Copies: ${copies}, Incoming Availability: ${availability}`);
+        // console.log( `[Pre-Update] Current Copies: ${ current.copies }, Current Availability: ${ current.availability }` );
+        // console.log( `[Pre-Update] Input Copies: ${ copies }, Input Availability: ${ availability }` );
         if (copies === 0) {
             update.$set = {
                 ...update.$set,
