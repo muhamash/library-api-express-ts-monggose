@@ -13,12 +13,12 @@
 #   "copies": 10
 # }
 
-PUT  http://localhost:3000/api/books/685818021c54e1c08c6a3d92
-Content-Type: application/json
+# PUT  http://localhost:3000/api/books/685818021c54e1c08c6a3d92
+# Content-Type: application/json
 
-{
-  "copies": 0
-}
+# {
+#   "copies": 0
+# }
 
 # GET  http://localhost:3000/api/books/6858079913f3c117b832751b
 # Content-Type: application/json
@@ -35,5 +35,5 @@ Content-Type: application/json
 # GET  http://localhost:3000/api/borrow
 # Content-Type: application/json
 
-# GET http://localhost:3000/api/books?sort=asc&filter=science
-# Content-Type: application/json
+GET http://localhost:3000/api/books
+Content-Type: application/json

@@ -90,7 +90,6 @@ The API uses **Zod** for strict request body validation, ensuring reliable and c
 
 | Technology       | Purpose                             |
 |------------------|-----------------------------------|
-| Node.js          | Runtime environment                |
 | Express.js       | Web framework                     |
 | TypeScript       | Static typing and tooling          |
 | MongoDB          | NoSQL document database           |

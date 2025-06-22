@@ -152,7 +152,6 @@ booksSchema.post("findOneAndDelete", async function (doc, next) {
         next(error);
     }
 });
-// availability control on update when copies are updated or availability is set to false if copies are 0 no force update return error to the user
 booksSchema.pre("findOneAndUpdate", async function (next) {
     try {
         const update = this.getUpdate();
@@ -174,32 +173,40 @@ booksSchema.pre("findOneAndUpdate", async function (next) {
             });
             throw err;
         }
-        let copies = update.copies ?? update.$set?.copies ?? current.copies;
-        let availability = update.availability ?? update.$set?.availability ?? current.availability;
-        // console.log( `[Pre-Update] Current Copies: ${ current.copies }, Current Availability: ${ current.availability }` );
-        // console.log( `[Pre-Update] Input Copies: ${ copies }, Input Availability: ${ availability }` );
-        if (copies === 0) {
-            update.$set = {
-                ...update.$set,
-                availability: false,
-            };
-            this.setUpdate(update);
-            availability = false;
-        }
-        if (update.copies === 0 && update.availability === true || current.copies === 0 && update.availability === true) {
-            const err = new Error("Cannot set availability to true when copies are 0.");
+        // Normalize update to $set style
+        const $set = {
+            ...update.$set,
+            ...('copies' in update ? { copies: update.copies } : {}),
+            ...('availability' in update ? { availability: update.availability } : {}),
+        };
+        // determine final values
+        const finalCopies = $set.copies ?? current.copies;
+        const finalAvailability = $set.availability ?? current.availability;
+        // Check for  state: copies = 0 but user tries to set availability = true
+        if (finalCopies === 0 && 'availability' in update && update.availability === true) {
+            const err = new Error("Cannot set availability to true when copies is 0");
             Object.assign(err, {
-                name: "InvalidAvailabilityUpdateError",
+                name: "InvalidAvailabilityError",
                 status: 400,
                 success: false,
                 error: {
-                    name: "[Pre-Update Error]",
-                    message: "Cannot set availability to true when copies are 0",
+                    name: "[Pre-Update Validation Error]",
+                    message: "Cannot set availability to true when copies is 0. Books with 0 copies must have availability set to false.",
                 },
-                data: null,
+                data: {
+                    currentCopies: current.copies,
+                    requestedCopies: finalCopies,
+                    requestedAvailability: update.availability,
+                },
             });
             throw err;
         }
+        //apply if copies = 0, force availability = false 
+        if (finalCopies === 0) {
+            $set.availability = false;
+        }
+        update.$set = $set;
+        this.setUpdate(update);
         next();
     }
     catch (error) {
